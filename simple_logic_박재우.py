@@ -1,12 +1,5 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
-</head>
-<body>
-    <!-- import datetime
+#simple Logic
+import datetime
 #딕셔너리를 사용해 키워드와 응답을 짝을 짓고 키워드가 있을시 응답을 답하는 형식
 responses = {
     "안녕" : "안녕하세요! 무엇을 도와드릴까요?",
@@ -31,6 +24,4 @@ while True:
         break
     response = get_responses(user_input)
     print("챗봇: ", response)
- -->
-</body>
-</html>
+
