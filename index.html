@@ -35,4 +35,29 @@ while True:
     print("챗봇: ", response)
  -->
 </body>
+ <!--  
+from datetime import datetime
+
+def chatbot():
+    print("안녕하세요! 챗봇입니다. 무엇을 도와드릴까요?")
+    
+    while True:
+        user_input = input("당신: ")
+        
+        if "안녕" in user_input:
+            print("챗봇: 안녕하세요! 만나서 반가워요.")
+        elif "잘 가" in user_input or "종료" in user_input:
+            print("챗봇: 안녕히 가세요!")
+            break
+        elif "이름" in user_input:
+            print("챗봇: 저는 챗밭입니다.")
+        elif "날짜" in user_input:
+            print("챗봇: 오늘은",datetime.now().year , "년",datetime.now().month , "월",datetime.now().day , "일 입니다.")
+        elif "시간" in user_input:
+            print("챗봇: 현재 시간은",datetime.now().hour,"시",datetime.now().minute,"분",datetime.now().second,"초 입니다")
+        else:
+            print("챗봇: 죄송해요, 이해하지 못했어요.")
+            
+chatbot()
+-->
 </html>
