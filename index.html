@@ -4,7 +4,91 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Document</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            background-color: #f2f2f2;
+        }
+        .chat-container {
+            width: 360px;
+            height: 600px;
+            display: flex;
+            flex-direction: column;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            overflow: hidden;
+            background-color: #ffffff;
+        }
+        .chat-header {
+            background-color: #4a90e2;
+            color: white;
+            text-align: center;
+            padding: 10px;
+            font-size: 1.2em;
+        }
+        .chat-messages {
+            flex-grow: 1;
+            padding: 20px;
+            overflow-y: auto;
+            border-top: 1px solid #e0e0e0;
+            border-bottom: 1px solid #e0e0e0;
+        }
+        .message {
+            margin-bottom: 15px;
+            line-height: 1.5;
+        }
+        .user-message {
+            text-align: right;
+            color: #4a4a4a;
+        }
+        .bot-message {
+            text-align: left;
+            color: #4a90e2;
+        }
+        .chat-input {
+            display: flex;
+            padding: 10px;
+            border-top: 1px solid #ddd;
+            background-color: #fafafa;
+        }
+        .chat-input input {
+            flex-grow: 1;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 1em;
+        }
+        .chat-input button {
+            background-color: #4a90e2;
+            color: white;
+            border: none;
+            padding: 10px;
+            margin-left: 8px;
+            cursor: pointer;
+            border-radius: 4px;
+        }
+        .chat-input button:hover {
+            background-color: #3b78c2;
+        }
+    </style>
 </head>
+<body><div class="chat-container">
+    <div class="chat-header">국립한밭대학교 챗봇</div>
+    <div class="chat-messages">
+        <div class="message user-message">국립한밭대학교</div>
+        <div class="message bot-message">한밭봇과 대화를 시작해보세요!</div>
+    </div>
+    <div class="chat-input">
+        <input type="text" placeholder="메시지 입력....">
+        <button>↩</button>
+    </div>
+</div>
+</body>
 <body>
     <!-- import datetime
 #딕셔너리를 사용해 키워드와 응답을 짝을 짓고 키워드가 있을시 응답을 답하는 형식
