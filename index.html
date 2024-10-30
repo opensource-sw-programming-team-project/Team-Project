@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
+    <title>HanbatBot</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -15,149 +15,128 @@
             background-color: #f2f2f2;
         }
         .chat-container {
-            width: 360px;
-            height: 600px;
+            width: 600px;
+            height: 710px;
             display: flex;
             flex-direction: column;
-            border-radius: 8px;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-            overflow: hidden;
-            background-color: #ffffff;
+            border-radius: 20px;
+            box-shadow: 0 0 8px rgba(0, 0, 0, 0.2);
+            overflow: auto;
+            background-color: #d9dbe9;
         }
         .chat-header {
-            background-color: #4a90e2;
-            color: white;
+            background-color: #000000;
+            color: rgb(255, 255, 255);
             text-align: center;
-            padding: 10px;
-            font-size: 1.2em;
+            padding: 15px;
+            font-size: 1.1em;
         }
         .chat-messages {
             flex-grow: 1;
-            padding: 20px;
+            padding: 15px;
             overflow-y: auto;
-            border-top: 1px solid #e0e0e0;
+            border-top: 1px solid #ffffff;
             border-bottom: 1px solid #e0e0e0;
+            text-align: left;
+            display: flex;
+            flex-direction: column;
         }
         .message {
-            margin-bottom: 15px;
-            line-height: 1.5;
+            margin-bottom: 5px;
+            line-height: 2.0;
         }
         .user-message {
-            text-align: right;
-            color: #4a4a4a;
+            text-align: left;
+            color: #000000;
         }
         .bot-message {
-            text-align: left;
-            color: #4a90e2;
+            text-align: right;
+            color: #000000;
+            
         }
         .chat-input {
             display: flex;
-            padding: 10px;
-            border-top: 1px solid #ddd;
+            padding: 15px;
+            border-top: 3px solid #000000;
             background-color: #fafafa;
         }
         .chat-input input {
             flex-grow: 1;
-            padding: 10px;
-            border: 1px solid #ddd;
-            border-radius: 4px;
+            padding: 15px;
+            border: 1px solid #000000;
+            border-radius: 8px;
             font-size: 1em;
         }
         .chat-input button {
-            background-color: #4a90e2;
-            color: white;
+            background-color: #a0a0a0;
+            color: rgb(255, 255, 255);
             border: none;
-            padding: 10px;
+            padding: 20px;
             margin-left: 8px;
             cursor: pointer;
-            border-radius: 4px;
+            border-radius: 8px;
+            font-size: 1.5em;
         }
         .chat-input button:hover {
-            background-color: #3b78c2;
+            background-color: #000000;
         }
     </style>
 </head>
-<body><div class="chat-container">
-    <div class="chat-header">국립한밭대학교 챗봇</div>
-    <div class="chat-messages">
-        <div class="message user-message">국립한밭대학교</div>
-        <div class="message bot-message">한밭봇과 대화를 시작해보세요!</div>
-    </div>
-    <div class="chat-input">
-        <input type="text" placeholder="메시지 입력....">
-        <button>↩</button>
-    </div>
-</div>
-</body>
 <body>
-    <!-- import datetime
-#딕셔너리를 사용해 키워드와 응답을 짝을 짓고 키워드가 있을시 응답을 답하는 형식
-responses = {
-    "안녕" : "안녕하세요! 무엇을 도와드릴까요?",
-    "안녕하세요" : "안녕하세요! 무엇을 도와드릴까요?",
-    "시간" : "현재 시간은 {}입니다",
-    "자기소개" : "저의 이름은 한밭봇이에요!"
-    "이름" : "저의 이름은 한밭봇이에요!" # 박현수 추가
-    "고마워" : "천만에요!"
-    "요일": "오늘 요일은 {}입니다." # 안형욱 추가
-}
+    <div class="chat-container">
+        <div class="chat-header"><b>국립한밭대학교 챗봇</b></div>
+        <div class="chat-messages" id="chat-messages">
+            <div class="message bot-message"></div>
+        </div>
+        <div class="chat-input">
+            <input type="text" id="chat-input" placeholder="메시지 ChatBPT"/>
+            <button>↑</button>
+        </div>
+    </div>
 
-# 영어 요일을 한국어 요일로 매핑하는 딕셔너리
-day_mapping = {
-    "Monday": "월요일",
-    "Tuesday": "화요일",
-    "Wednesday": "수요일",
-    "Thursday": "목요일",
-    "Friday": "금요일",
-    "Saturday": "토요일",
-    "Sunday": "일요일"
-}
+    <script>
+        document.querySelector(".chat-input button").addEventListener("click", async () => {
+            const inputField = document.getElementById("chat-input");
+            const messageText = inputField.value.trim();
 
-def get_responses(user_input):   #사용자에게 입력을 받아 키워드가 포함되어있는지 확인
-    for key in responses: 
-        if key in user_input:
-            if key == "시간":
-                time = datetime.datetime.now().strftime("%H:%M:%S")
-                return responses[key].format(time) #시간을 문자열에 포함
-            else:
-                return responses[key]
-    return "죄송합니다 이해하지 못했습니다."
+            if (messageText !== "") {
+                const chatMessages = document.getElementById("chat-messages");
 
-while True:
-    user_input = input("입력:")
-    if user_input == "종료":
-        break
-    response = get_responses(user_input)
-    print("챗봇: ", response)
- -->
+                // 사용자 메시지 출력
+                const userMessage = document.createElement("div");
+                userMessage.classList.add("message", "user-message");
+                userMessage.textContent = `나: ${messageText}`;
+                chatMessages.appendChild(userMessage);
+
+                inputField.value = "";
+
+                // 서버에 메시지 보내기
+                const response = await fetch('http://127.0.0.1:5000/message', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ message: messageText }),
+                });
+
+                const data = await response.json();
+
+                // 챗봇의 응답 출력
+                const botMessage = document.createElement("div");
+                botMessage.classList.add("message", "bot-message");
+                botMessage.textContent = `${data.response}`;
+                chatMessages.appendChild(botMessage);
+
+                // Scroll to the bottom
+                chatMessages.scrollTop = chatMessages.scrollHeight;
+            }
+        });
+
+        document.getElementById("chat-input").addEventListener("keypress", function (e) {
+            if (e.key === "Enter") {
+                document.querySelector(".chat-input button").click();
+            }
+        });
+    </script>
 </body>
- <!--  
-from datetime import datetime
-
-def chatbot():
-    print("안녕하세요! 챗봇입니다. 무엇을 도와드릴까요?")
-    
-    while True:
-        user_input = input("당신: ")
-        
-        if "안녕" in user_input:
-            print("챗봇: 안녕하세요! 만나서 반가워요.")
-        elif "잘 가" in user_input or "종료" in user_input:
-            print("챗봇: 안녕히 가세요!")
-            break
-        elif "이름" in user_input:
-            print("챗봇: 저는 챗밭입니다.")
-        elif "날짜" in user_input:
-            print("챗봇: 오늘은",datetime.now().year , "년",datetime.now().month , "월",datetime.now().day , "일 입니다.")
-        elif "시간" in user_input:
-            print("챗봇: 현재 시간은",datetime.now().hour,"시",datetime.now().minute,"분",datetime.now().second,"초 입니다")
-        elif "요일" in user_input: # 요일 입력받고 답 ! 안형욱 추가
-            day = datetime.datetime.now().strftime("%A")  # 요일 (영어)
-            korean_day = day_mapping.get(day, day) #한국어로 변환
-            print("챗봇: 오늘 요일은",korean_day,"입니다")
-        else:
-            print("챗봇: 죄송해요, 이해하지 못했어요.")
-            
-chatbot()
--->
 </html>
