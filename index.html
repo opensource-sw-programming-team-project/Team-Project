@@ -124,7 +124,7 @@
                 // 챗봇의 응답 출력
                 const botMessage = document.createElement("div");
                 botMessage.classList.add("message", "bot-message");
-                botMessage.textContent = `${data.response}`;
+                botMessage.innerHTML = `${data.response.replace(/\n/g, "<br>")}`; //\n 줄바꿈을 인식하고 <br>줄바꿈으로 변경하여 줄바꿈 출력 (박재우)
                 chatMessages.appendChild(botMessage);
 
                 // Scroll to the bottom

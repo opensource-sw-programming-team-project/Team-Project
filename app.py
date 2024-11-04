@@ -34,6 +34,33 @@ time_zones = {
     "아르헨티나": "America/Argentina/Buenos_Aires",
 } #여러 국가의 타임존을 미리 저장후 불러오기
 
+#국가 코드 정보(박재우)
+counrty_code = {
+    "아랍에미리트" : "AED",
+    "호주" : "AUD",
+    "바레인" : "BHD",
+    "브루나이" : "BND",
+    "캐나다" : "CAD",
+    "스위스" : "CHF",
+    "중국" : "CNH",
+    "덴마크" : "DKK",
+    "유로연합" : "EUR",
+    "영국" : "GBP",
+    "홍콩" : "HKD",
+    "인도네시아" : "IDR",
+    "일본" : "JPY",
+    "한국" : "KRW",
+    "쿠웨이트" : "KWD",
+    "말레이시아" : "MYR",
+    "노르웨이" : "NOK",
+    "뉴질랜드" : "NZD",
+    "사우디아라비아" : "SAR",
+    "스웨덴" : "SEK",
+    "싱가포르" : "SGD",
+    "태국" : "THB",
+    "미국" : "USD"
+} #국가와 국가코드를 매칭
+
 # 불용어 제거를 위한 조사 리스트
 stopwords = ['은', '는', '이', '가', '을', '를', '에', '의', '에서', '와', '과', '도', '으로', '하다']
 
@@ -41,7 +68,8 @@ stopwords = ['은', '는', '이', '가', '을', '를', '에', '의', '에서', '
 intents = {
     "greeting": ["안녕", "하이", "안녕하세요"],
     "time_request": ["몇 시", "시간", "몇시"],
-    "help_request": ["도와줘", "도움", "어떻게"]
+    "help_request": ["도와줘", "도움", "어떻게"],
+    "exchange_rate_request": ["환율", "환율정보", "환전"] #환율 정보 API 키워드(박재우)
 }
 
 # 키워드 추출 및 불용어 제거
@@ -57,6 +85,39 @@ def detect_intent(text):
         if any(keyword in tokens for keyword in keywords):
             return intent
     return "unknown"
+
+#환율 정보 API(박재우)
+def get_exchange_rate(countrycode, date, country):
+    url = "https://www.koreaexim.go.kr/site/program/financial/exchangeJSON"
+    auth_key = "DKWGm3i0m5yiRLoGgombHtYiuLwE3mYV"
+
+    #API 요청 파라미터
+    params = {
+        "authkey" : auth_key,
+        "searchdate": date,
+        "data" : "AP01"
+    }
+
+    try:
+        response = requests.get(url, params=params)
+        response.raise_for_status()
+
+        data = response.json()
+
+        for i in data:
+            if i['cur_unit'] == countrycode:
+                return{
+                    'date' : date,
+                    'country' : i['cur_nm'],
+                    'exchange_rate' : i['ttb'],
+                    'purchase_rate' : i['ttb'],
+                    'sell_rate' : i['tts']
+                }
+        #요청한 국가가 환율 정보가 없는 경우
+        return {"response": f"{country}에 대한 환율 정보를 찾을 수 없습니다."}
+    except requests.exceptions.RequestException as e:
+        return {"response": f"API 요청 중 오류가 발생했습니다: {e}"}
+
 
 @app.route('/message', methods=['POST'])
 def respond():
@@ -93,6 +154,23 @@ def respond():
         
         current_time = datetime.now().strftime("%Y-%m-%d %H시%M분%S초")
         return jsonify({"response": f"현재 시간은 {current_time}입니다."})
+    #환율 정보 API 호출 (박재우)
+    elif intent == "exchange_rate_request":
+        for country in counrty_code.keys():
+            if country in keywords:
+                date = 20240830 # API 정보중 가장 최신 정보
+                countrycode = counrty_code[country]
+                rate_info = get_exchange_rate(countrycode, date, country)
+                if "response" in rate_info:
+                    return jsonify(rate_info)
+                else:
+                    return jsonify({
+                        "response" : f"2024년 8월 30일 기준 {rate_info['country']} 환율 정보: \n"
+                                     f"매매기준율: {rate_info['exchange_rate']}원 \n"
+                                     f"매입환율: {rate_info['purchase_rate']}원 \n"
+                                     f"매도환율: {rate_info['sell_rate']}원 \n"
+                    })
+        return jsonify({"response" : "해당 국가의 환율 정보를 찾을 수 없습니다."})
     
     elif intent == "help_request":
         return jsonify({"response": "무엇을 도와드릴까요?"})
