@@ -61,6 +61,102 @@ counrty_code = {
     "미국" : "USD"
 } #국가와 국가코드를 매칭
 
+# 국가명과 수도의 좌표 매핑(Chat GPT 사용)
+capital_mapping = {
+    '가나': {'latitude': 5.6037, 'longitude': -0.1870},
+    '가이아나': {'latitude': 6.8013, 'longitude': -58.1551},
+    '과테말라': {'latitude': 14.6349, 'longitude': -90.5069},
+    '그리스': {'latitude': 37.9838, 'longitude': 23.7275},
+    '나이지리아': {'latitude': 9.0765, 'longitude': 7.3986},
+    '남아프리카공화국': {'latitude': -25.7479, 'longitude': 28.2293},
+    '네덜란드': {'latitude': 52.3676, 'longitude': 4.9041},
+    '네팔': {'latitude': 27.7172, 'longitude': 85.3240},
+    '노르웨이': {'latitude': 59.9139, 'longitude': 10.7522},
+    '뉴질랜드': {'latitude': -41.2865, 'longitude': 174.7762},
+    '대만': {'latitude': 25.0330, 'longitude': 121.5654},
+    '대한민국': {'latitude': 37.5665, 'longitude': 126.9780},
+    '덴마크': {'latitude': 55.6761, 'longitude': 12.5683},
+    '독일': {'latitude': 52.5200, 'longitude': 13.4050},
+    '라오스': {'latitude': 17.9757, 'longitude': 102.6331},
+    '라트비아': {'latitude': 56.9496, 'longitude': 24.1052},
+    '러시아': {'latitude': 55.7558, 'longitude': 37.6176},
+    '루마니아': {'latitude': 44.4268, 'longitude': 26.1025},
+    '리투아니아': {'latitude': 54.6872, 'longitude': 25.2797},
+    '마다가스카르': {'latitude': -18.8792, 'longitude': 47.5079},
+    '말레이시아': {'latitude': 3.1390, 'longitude': 101.6869},
+    '멕시코': {'latitude': 19.4326, 'longitude': -99.1332},
+    '몽골': {'latitude': 47.8864, 'longitude': 106.9057},
+    '미국': {'latitude': 38.9072, 'longitude': -77.0369},
+    '미얀마': {'latitude': 19.7633, 'longitude': 96.0785},
+    '방글라데시': {'latitude': 23.8103, 'longitude': 90.4125},
+    '베네수엘라': {'latitude': 10.4806, 'longitude': -66.9036},
+    '베트남': {'latitude': 21.0285, 'longitude': 105.8542},
+    '벨기에': {'latitude': 50.8503, 'longitude': 4.3517},
+    '벨라루스': {'latitude': 53.9006, 'longitude': 27.5590},
+    '볼리비아': {'latitude': -16.5000, 'longitude': -68.1500},
+    '북마케도니아': {'latitude': 41.9981, 'longitude': 21.4254},
+    '브라질': {'latitude': -15.8267, 'longitude': -47.9218},
+    '사우디아라비아': {'latitude': 24.7136, 'longitude': 46.6753},
+    '세르비아': {'latitude': 44.7866, 'longitude': 20.4489},
+    '솔로몬제도': {'latitude': -9.4289, 'longitude': 159.9602},
+    '수리남': {'latitude': 5.8520, 'longitude': -55.2038},
+    '스웨덴': {'latitude': 59.3293, 'longitude': 18.0686},
+    '스위스': {'latitude': 46.9480, 'longitude': 7.4474},
+    '스페인': {'latitude': 40.4168, 'longitude': -3.7038},
+    '슬로바키아': {'latitude': 48.1486, 'longitude': 17.1077},
+    '시리아': {'latitude': 33.5138, 'longitude': 36.2765},
+    '아랍에미리트': {'latitude': 24.4539, 'longitude': 54.3773},
+    '아르헨티나': {'latitude': -34.6037, 'longitude': -58.3816},
+    '아이슬란드': {'latitude': 64.1355, 'longitude': -21.8954},
+    '아제르바이잔': {'latitude': 40.4093, 'longitude': 49.8671},
+    '아프가니스탄': {'latitude': 34.5553, 'longitude': 69.2075},
+    '알바니아': {'latitude': 41.3275, 'longitude': 19.8187},
+    '에콰도르': {'latitude': -0.1807, 'longitude': -78.4678},
+    '에티오피아': {'latitude': 9.1450, 'longitude': 40.4897},
+    '영국': {'latitude': 51.5074, 'longitude': -0.1278},
+    '오스트레일리아': {'latitude': -35.2809, 'longitude': 149.1300},
+    '오스트리아': {'latitude': 48.2082, 'longitude': 16.3738},
+    '온두라스': {'latitude': 14.0723, 'longitude': -87.1921},
+    '우루과이': {'latitude': -34.9011, 'longitude': -56.1645},
+    '우즈베키스탄': {'latitude': 41.2995, 'longitude': 69.2401},
+    '우크라이나': {'latitude': 50.4501, 'longitude': 30.5234},
+    '이라크': {'latitude': 33.3152, 'longitude': 44.3661},
+    '이란': {'latitude': 35.6892, 'longitude': 51.3890},
+    '이스라엘': {'latitude': 31.7683, 'longitude': 35.2137},
+    '이집트': {'latitude': 30.0444, 'longitude': 31.2357},
+    '이탈리아': {'latitude': 41.9028, 'longitude': 12.4964},
+    '인도': {'latitude': 28.6139, 'longitude': 77.2090},
+    '인도네시아': {'latitude': -6.2088, 'longitude': 106.8456},
+    '일본': {'latitude': 35.6895, 'longitude': 139.6917},
+    '자메이카': {'latitude': 18.0179, 'longitude': -76.8099},
+    '중국': {'latitude': 39.9042, 'longitude': 116.4074},
+    '체코': {'latitude': 50.0755, 'longitude': 14.4378},
+    '칠레': {'latitude': -33.4489, 'longitude': -70.6693},
+    '카자흐스탄': {'latitude': 51.1694, 'longitude': 71.4491},
+    '캐나다': {'latitude': 45.4215, 'longitude': -75.6972},
+    '케냐': {'latitude': -1.2864, 'longitude': 36.8172},
+    '콜롬비아': {'latitude': 4.7110, 'longitude': -74.0721},
+    '콩고': {'latitude': -4.2634, 'longitude': 15.2429},
+    '쿠바': {'latitude': 23.1136, 'longitude': -82.3666},
+    '크로아티아': {'latitude': 45.8130, 'longitude': 15.9775},
+    '타이': {'latitude': 13.7563, 'longitude': 100.5018},
+    '태국': {'latitude': 13.7563, 'longitude': 100.5018},
+    '튀르키예': {'latitude': 39.9334, 'longitude': 32.8597},
+    '파라과이': {'latitude': -25.2637, 'longitude': -57.5759},
+    '파키스탄': {'latitude': 33.6844, 'longitude': 73.0479},
+    '파푸아뉴기니': {'latitude': -9.4438, 'longitude': 147.1803},
+    '페루': {'latitude': -12.0464, 'longitude': -77.0428},
+    '포르투갈': {'latitude': 38.7169, 'longitude': -9.1399},
+    '폴란드': {'latitude': 52.2297, 'longitude': 21.0122},
+    '프랑스': {'latitude': 48.8566, 'longitude': 2.3522},
+    '핀란드': {'latitude': 60.1695, 'longitude': 24.9355},
+    '필리핀': {'latitude': 14.5995, 'longitude': 120.9842},
+    '한국': {'latitude': 37.5665, 'longitude': 126.9780},
+    '헝가리': {'latitude': 47.4979, 'longitude': 19.0402},
+    '호주': {'latitude': -35.2809, 'longitude': 149.1300}
+    # 다른 국가 추가 가능
+}
+
 # 불용어 제거를 위한 조사 리스트
 stopwords = ['은', '는', '이', '가', '을', '를', '에', '의', '에서', '와', '과', '도', '으로', '하다']
 
@@ -69,7 +165,9 @@ intents = {
     "greeting": ["안녕", "하이", "안녕하세요"],
     "time_request": ["몇 시", "시간", "몇시"],
     "help_request": ["도와줘", "도움", "어떻게"],
-    "exchange_rate_request": ["환율", "환율정보", "환전"] #환율 정보 API 키워드(박재우)
+    "exchange_rate_request": ["환율", "환율정보", "환전"], #환율 정보 API 키워드(박재우)
+    "weather_request": ["날씨", "기온", "온도"],
+    "air_pollution_request": ["대기오염", "미세먼지", "초미세먼지"]
 }
 
 # 키워드 추출 및 불용어 제거
@@ -118,6 +216,65 @@ def get_exchange_rate(countrycode, date, country):
     except requests.exceptions.RequestException as e:
         return {"response": f"API 요청 중 오류가 발생했습니다: {e}"}
 
+# Weather API
+def weather_api(country_name):
+    # OpenWeatherMap API Key
+    api_key = '76709f4e1bf2023762668cf9b449c3b3'
+
+    # 국가명에 따른 수도의 좌표 선택
+    capital_coordinate = capital_mapping.get(country_name, None)
+
+    if capital_coordinate is None:
+        return '지원하지 않는 국가입니다. 다른 국가를 입력해 주세요.'
+    
+    # 좌표 변수 설정
+    latitude = capital_coordinate['latitude']
+    longitude = capital_coordinate['longitude']
+
+    # Weather API URL
+    weather_api_url = f'https://api.openweathermap.org/data/2.5/weather?lat={latitude}&lon={longitude}&appid={api_key}&lang=kr'  # 한국어 지원
+
+    # 데이터 가져오기
+    weather_information = requests.get(weather_api_url)
+    weather_data = weather_information.json()
+
+    # 질문에 따른 응답 생성
+    if weather_information.status_code == 200:
+        weather_response = f"날씨는 {weather_data['weather'][0]['description']}, 기온은 {weather_data['main']['temp'] - 273.15:.1f}°C입니다."
+    else:
+        weather_response = f"날씨 정보를 가져올 수 없습니다: {weather_data.get('message', '알 수 없는 오류')}."
+
+    return weather_response
+
+# Air Pollution API
+def air_pollution_api(country_name):
+    # OpenWeatherMap API Key
+    api_key = '76709f4e1bf2023762668cf9b449c3b3'
+
+    # 국가명에 따른 수도의 좌표 선택
+    capital_coordinate = capital_mapping.get(country_name, None)
+
+    if capital_coordinate is None:
+        return '지원하지 않는 국가입니다. 다른 국가를 입력해 주세요.'
+    
+    # 좌표 변수 설정
+    latitude = capital_coordinate['latitude']
+    longitude = capital_coordinate['longitude']
+
+    # Air Pollution API URL
+    air_pollution_api_url = f'http://api.openweathermap.org/data/2.5/air_pollution?lat={latitude}&lon={longitude}&appid={api_key}'
+
+    # 데이터 가져오기
+    air_pollution_information = requests.get(air_pollution_api_url)
+    air_pollution_data = air_pollution_information.json()
+
+   # 질문에 따른 응답 생성
+    if air_pollution_information.status_code == 200:
+        air_pollution_response = f"미세먼지(PM10) 농도는 {air_pollution_data['list'][0]['components']['pm10']:.1f}, 초미세먼지(PM2.5) 농도는 {air_pollution_data['list'][0]['components']['pm2_5']:.1f}입니다."
+    else:
+        air_pollution_response = f"미세먼지 정보를 가져올 수 없습니다: {air_pollution_data.get('message', '알 수 없는 오류')}."
+
+    return air_pollution_response
 
 @app.route('/message', methods=['POST'])
 def respond():
@@ -171,6 +328,20 @@ def respond():
                                      f"매도환율: {rate_info['sell_rate']}원 \n"
                     })
         return jsonify({"response" : "해당 국가의 환율 정보를 찾을 수 없습니다."})
+    
+    # Weather API 호출
+    elif intent == "weather_request":
+        for country_name in capital_mapping.keys():
+            if country_name in keywords:
+                weather_api_response = weather_api(country_name)
+                return jsonify({"response": weather_api_response})
+            
+    # Air Pollution API 호출
+    elif intent == "air_pollution_request":
+        for country_name in capital_mapping.keys():
+            if country_name in keywords:
+                air_pollution_api_response = air_pollution_api(country_name)
+                return jsonify({"response": air_pollution_api_response})
     
     elif intent == "help_request":
         return jsonify({"response": "무엇을 도와드릴까요?"})
