@@ -325,6 +325,7 @@ def respond():
     user_message = request.json.get('message')
 
     time.sleep(1)
+    #오타 및 맞춤법 검사
     correct_message = spell_checker.check(user_message)
     # 사용자 메시지에서 불용어 제거 후 키워드 추출
     keywords = extract_keywords(correct_message.checked)
