@@ -4,6 +4,7 @@ from datetime import datetime #재우님
 from konlpy.tag import Okt #종명
 import time
 import requests
+from hanspell import spell_checker
 
 app = Flask(__name__)
 CORS(app)
@@ -324,12 +325,12 @@ def respond():
     user_message = request.json.get('message')
 
     time.sleep(1)
-
+    correct_message = spell_checker.check(user_message)
     # 사용자 메시지에서 불용어 제거 후 키워드 추출
-    keywords = extract_keywords(user_message)
+    keywords = extract_keywords(correct_message.checked)
     
     # 사용자 의도 파악
-    intent = detect_intent(user_message)
+    intent = detect_intent(correct_message.checked)
     
     # 의도에 따른 응답
     if intent == "greeting":
