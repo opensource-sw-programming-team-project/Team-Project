@@ -5,6 +5,7 @@ from konlpy.tag import Okt #종명
 import time
 import requests
 from hanspell import spell_checker
+import re
 
 app = Flask(__name__)
 CORS(app)
@@ -202,7 +203,7 @@ capital_mapping = {
 }
 
 # 불용어 제거를 위한 조사 리스트
-stopwords = ['은', '는', '이', '가', '을', '를', '에', '의', '에서', '와', '과', '도', '으로', '하다']
+stopwords = ['은', '는', '이', '가', '을', '를', '에', '의', '에서', '도', '으로', '하다']
 
 # 키워드 정의 딕셔너리
 intents = {
@@ -214,6 +215,39 @@ intents = {
     "air_pollution_request": ["대기오염", "미세먼지", "초미세먼지"]
 }
 
+# 마침표,물음표,마침표 기준으로 문장 분리
+def split_sentences(text):
+    sentences = re.split(r'(?<=[.?!])\s+', text.strip())
+    return sentences
+# 연결어를 포함한 명사-조사 결합 분리
+def split_with_morpheme(sentence):
+    tokens = okt.pos(sentence)
+    split_parts = []
+    for word, pos in tokens:
+        if pos == "Josa" and word in ["와", "과"]:
+            split_parts[-1] += word  # 앞의 명사에 붙임
+        else:
+            split_parts.append(word)
+    return split_parts
+
+# 연결어를 기준으로 문장 분리
+def split_with_connectors_and_morpheme(sentence):
+    split_parts = split_with_morpheme(sentence)
+    results = []
+    current_part = []
+    for word in split_parts:
+        if word.endswith("와") or word.endswith("과"):
+            current_part.append(word)
+            results.append(" ".join(current_part))
+            current_part = []
+        else:
+            current_part.append(word)
+    if current_part:
+        results.append(" ".join(current_part))
+    return results
+def spellcheck(text):
+    correct_message = spell_checker.check(text)
+    return correct_message.checked
 # 키워드 추출 및 불용어 제거
 def extract_keywords(text):
     tokens = okt.morphs(text)
@@ -326,73 +360,87 @@ def respond():
 
     time.sleep(1)
     #오타 및 맞춤법 검사
-    correct_message = spell_checker.check(user_message)
-    # 사용자 메시지에서 불용어 제거 후 키워드 추출
-    keywords = extract_keywords(correct_message.checked)
+    correct_message = spellcheck(user_message)
+
+    sentences = split_sentences(correct_message)
+
+    responses = []
+    for sentence in sentences:
+        parts = split_with_connectors_and_morpheme(sentence)
     
+        for part in parts:
+    # 사용자 메시지에서 불용어 제거 후 키워드 추출
+            keywords = extract_keywords(part)
+
     # 사용자 의도 파악
-    intent = detect_intent(correct_message.checked)
+            intent = detect_intent(part)
     
     # 의도에 따른 응답
-    if intent == "greeting":
-        return jsonify({"response": "안녕하세요! 반갑습니다."})
+            if intent == "greeting":
+                responses.append("안녕하세요! 반갑습니다.")
     
-    elif intent == "time_request":
-        for country, time_zone in time_zones.items():
-            if country in keywords:
-                url = f"https://timeapi.io/api/time/current/zone?timeZone={time_zone}"
-                response = requests.get(url)
-                if response.status_code == 200: #요청이 성공한 경
-                    current_world_time = response.json()
-                    datetime_str = current_world_time['dateTime']
-                    formatted_time = datetime_str.split('.')[0].replace('T', ' ')
-                    
-                    date_part, time_part = formatted_time.split(' ')
-                    hour, minute, second = time_part.split(':')
-                    
-                    return jsonify({"response": f"{country}의 현재 시간은 {date_part} {hour}시 {minute}분 {second}초 에."})
+            elif intent == "time_request":
+                for country, time_zone in time_zones.items():
+                    if country in keywords:
+                        url = f"https://timeapi.io/api/time/current/zone?timeZone={time_zone}"
+                        response = requests.get(url)
+                        if response.status_code == 200: #요청이 성공한 경
+                            current_world_time = response.json()
+                            datetime_str = current_world_time['dateTime']
+                            formatted_time = datetime_str.split('.')[0].replace('T', ' ')
+                        
+                            date_part, time_part = formatted_time.split(' ')
+                            hour, minute, second = time_part.split(':')
+                        
+                            responses.append(f"{country}의 현재 시간은 {date_part} {hour}시 {minute}분 {second}초입니다.")
+                            break
+                        else:
+                            return jsonify({"response": "시간 정보를 가져오는 데 실패했어요."})
                 else:
-                    return jsonify({"response": "시간 정보를 가져오는 데 실패했어요."})
+                    current_time = datetime.now().strftime("%Y-%m-%d %H시%M분%S초")
+                    responses.append(f"현재 시간은 {current_time}입니다.")
+        #환율 정보 API 호출 (박재우)
+            elif intent == "exchange_rate_request":
+                for country in counrty_code.keys():
+                    if country in keywords:
+                        date = 20240830 # API 정보중 가장 최신 정보
+                        countrycode = counrty_code[country]
+                        rate_info = get_exchange_rate(countrycode, date, country)
+                        if "response" in rate_info:
+                            return jsonify(rate_info)
+                        else:
+                            responses.append({
+                                f"2024년 8월 30일 기준 {rate_info['country']} 환율 정보: \n"
+                                f"매매기준율: {rate_info['exchange_rate']}원 \n"
+                                f"매입환율: {rate_info['purchase_rate']}원 \n"
+                                f"매도환율: {rate_info['sell_rate']}원 \n"
+                            })
+                        break
+                responses.append("해당 국가의 환율 정보를 찾을 수 없습니다.")
         
-        current_time = datetime.now().strftime("%Y-%m-%d %H시%M분%S초")
-        return jsonify({"response": f"현재 시간은 {current_time}입니다."})
-    #환율 정보 API 호출 (박재우)
-    elif intent == "exchange_rate_request":
-        for country in counrty_code.keys():
-            if country in keywords:
-                date = 20240830 # API 정보중 가장 최신 정보
-                countrycode = counrty_code[country]
-                rate_info = get_exchange_rate(countrycode, date, country)
-                if "response" in rate_info:
-                    return jsonify(rate_info)
-                else:
-                    return jsonify({
-                        "response" : f"2024년 8월 30일 기준 {rate_info['country']} 환율 정보: \n"
-                                     f"매매기준율: {rate_info['exchange_rate']}원 \n"
-                                     f"매입환율: {rate_info['purchase_rate']}원 \n"
-                                     f"매도환율: {rate_info['sell_rate']}원 \n"
-                    })
-        return jsonify({"response" : "해당 국가의 환율 정보를 찾을 수 없습니다."})
-    
-    # Weather API 호출
-    elif intent == "weather_request":
-        for country_name in capital_mapping.keys():
-            if country_name in keywords:
-                weather_api_response = weather_api(country_name)
-                return jsonify({"response": weather_api_response})
-            
-    # Air Pollution API 호출
-    elif intent == "air_pollution_request":
-        for country_name in capital_mapping.keys():
-            if country_name in keywords:
-                air_pollution_api_response = air_pollution_api(country_name)
-                return jsonify({"response": air_pollution_api_response})
-    
-    elif intent == "help_request":
-        return jsonify({"response": "무엇을 도와드릴까요?"})
-    
-    else:
-        return jsonify({"response": "알 수 없는 메시지입니다."})
+        # Weather API 호출
+            elif intent == "weather_request":
+                for country_name in capital_mapping.keys():
+                    if country_name in keywords:
+                        weather_api_response = weather_api(country_name)
+                        responses.append(weather_api_response)
+                        break
+                
+        # Air Pollution API 호출
+            elif intent == "air_pollution_request":
+                for country_name in capital_mapping.keys():
+                    if country_name in keywords:
+                        air_pollution_api_response = air_pollution_api(country_name)
+                        responses.append(air_pollution_api_response)
+                        break
+        
+            elif intent == "help_request":
+                responses.append("무엇을 도와드릴까요?")
+        
+            else:
+                responses.append("알 수 없는 메시지입니다.")
+        
+    return jsonify({"response":"\n".join(responses)})
 
 if __name__ == '__main__':
     app.run(debug=True)
