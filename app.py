@@ -37,7 +37,7 @@ time_zones = {
 } #여러 국가의 타임존을 미리 저장후 불러오기
 
 #국가 코드 정보(박재우)
-counrty_code = {
+country_code = {
     "아랍에미리트" : "AED",
     "호주" : "AUD",
     "바레인" : "BHD",
@@ -262,38 +262,6 @@ def detect_intent(text):
             return intent
     return "unknown"
 
-#환율 정보 API(박재우)
-def get_exchange_rate(countrycode, date, country):
-    url = "https://www.koreaexim.go.kr/site/program/financial/exchangeJSON"
-    auth_key = "DKWGm3i0m5yiRLoGgombHtYiuLwE3mYV"
-
-    #API 요청 파라미터
-    params = {
-        "authkey" : auth_key,
-        "searchdate": date,
-        "data" : "AP01"
-    }
-
-    try:
-        response = requests.get(url, params=params)
-        response.raise_for_status()
-
-        data = response.json()
-
-        for i in data:
-            if i['cur_unit'] == countrycode:
-                return{
-                    'date' : date,
-                    'country' : i['cur_nm'],
-                    'exchange_rate' : i['ttb'],
-                    'purchase_rate' : i['ttb'],
-                    'sell_rate' : i['tts']
-                }
-        #요청한 국가가 환율 정보가 없는 경우
-        return {"response": f"{country}에 대한 환율 정보를 찾을 수 없습니다."}
-    except requests.exceptions.RequestException as e:
-        return {"response": f"API 요청 중 오류가 발생했습니다: {e}"}
-
 # Weather API
 def weather_api(country_name):
     # OpenWeatherMap API Key
@@ -401,22 +369,52 @@ def respond():
                     responses.append(f"현재 시간은 {current_time}입니다.")
         #환율 정보 API 호출 (박재우)
             elif intent == "exchange_rate_request":
-                for country in counrty_code.keys():
+                country_requested = None
+                for country in country_code.keys():  # country_code 딕셔너리가 제대로 정의되어 있어야 합니다.
                     if country in keywords:
-                        date = 20240830 # API 정보중 가장 최신 정보
-                        countrycode = counrty_code[country]
-                        rate_info = get_exchange_rate(countrycode, date, country)
-                        if "response" in rate_info:
-                            return jsonify(rate_info)
-                        else:
-                            responses.append({
-                                f"2024년 8월 30일 기준 {rate_info['country']} 환율 정보: \n"
-                                f"매매기준율: {rate_info['exchange_rate']}원 \n"
-                                f"매입환율: {rate_info['purchase_rate']}원 \n"
-                                f"매도환율: {rate_info['sell_rate']}원 \n"
-                            })
+                        date = 20240830  # API 정보 중 가장 최신 정보 (예: 2024년 8월 30일)
+                        countrycode = country_code[country]  # 국가명에 해당하는 국가 코드
+
+                        url = "https://www.koreaexim.go.kr/site/program/financial/exchangeJSON"
+                        auth_key = "DKWGm3i0m5yiRLoGgombHtYiuLwE3mYV"
+
+                        # API 요청 파라미터
+                        params = {
+                            "authkey": auth_key,
+                            "searchdate": date,
+                            "data": "AP01"
+                        }
+
+                        try:
+                            response = requests.get(url, params=params)
+                            response.raise_for_status()  # 응답 상태 확인
+
+                            data = response.json()
+                            
+
+                            # 환율 정보 찾기
+                            found = False
+                            for i in data:
+                                if i['cur_unit'] == countrycode:
+                                    responses.append(
+                                        f"2024년 8월 30일 기준 {i['cur_nm']} 환율 정보: \n"
+                                        f"매매기준율: {i['ttb']}원 \n"
+                                         f"매입환율: {i['ttb']}원 \n"
+                                         f"매도환율: {i['tts']}원 \n")
+                                    found = True
+                                    break
+                            if not found:
+                                responses.append("해당 국가의 환율 정보를 찾을 수 없습니다.")
+                        
+                        except requests.exceptions.RequestException as e:
+                            responses.append(f"API 요청 중 오류가 발생했습니다: {e}")
+                        
                         break
-                responses.append("해당 국가의 환율 정보를 찾을 수 없습니다.")
+                else:
+                    if country_requested is None:
+                        responses.append("확실한 국가를 정해서 말해주세요.")
+                    else:
+                        responses.append("해당 국가의 환율 정보를 찾을 수 없습니다.")
         
         # Weather API 호출
             elif intent == "weather_request":
@@ -439,8 +437,10 @@ def respond():
         
             else:
                 responses.append("알 수 없는 메시지입니다.")
-        
+    # responses 리스트의 모든 항목을 문자열로 변환하여 join 처리
+    responses = [str(item).replace("\n", "<br>") for item in responses]  # responses의 모든 항목을 문자열로 변환
     return jsonify({"response":"\n".join(responses)})
 
 if __name__ == '__main__':
     app.run(debug=True)
+    
