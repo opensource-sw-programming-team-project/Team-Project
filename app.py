@@ -386,7 +386,7 @@ def respond():
                         }
 
                         try:
-                            response = requests.get(url, params=params)
+                            response = requests.get(url, params=params, verify=False)
                             response.raise_for_status()  # 응답 상태 확인
 
                             data = response.json()
