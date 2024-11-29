@@ -269,9 +269,6 @@ def weather_api(country_name):
 
     # 국가명에 따른 수도의 좌표 선택
     capital_coordinate = capital_mapping.get(country_name, None)
-
-    if capital_coordinate is None:
-        return '지원하지 않는 국가입니다. 다른 국가를 입력해 주세요.'
     
     # 좌표 변수 설정
     latitude = capital_coordinate['latitude']
@@ -286,7 +283,7 @@ def weather_api(country_name):
 
     # 질문에 따른 응답 생성
     if weather_information.status_code == 200:
-        weather_response = f"날씨는 {weather_data['weather'][0]['description']}, 기온은 {weather_data['main']['temp'] - 273.15:.1f}°C입니다."
+        weather_response = f"{country_name}의 날씨는 {weather_data['weather'][0]['description']}, 기온은 {weather_data['main']['temp'] - 273.15:.1f}°C입니다."
     else:
         weather_response = f"날씨 정보를 가져올 수 없습니다: {weather_data.get('message', '알 수 없는 오류')}."
 
@@ -299,9 +296,6 @@ def air_pollution_api(country_name):
 
     # 국가명에 따른 수도의 좌표 선택
     capital_coordinate = capital_mapping.get(country_name, None)
-
-    if capital_coordinate is None:
-        return '지원하지 않는 국가입니다. 다른 국가를 입력해 주세요.'
     
     # 좌표 변수 설정
     latitude = capital_coordinate['latitude']
@@ -316,7 +310,7 @@ def air_pollution_api(country_name):
 
    # 질문에 따른 응답 생성
     if air_pollution_information.status_code == 200:
-        air_pollution_response = f"미세먼지(PM10) 농도는 {air_pollution_data['list'][0]['components']['pm10']:.1f}, 초미세먼지(PM2.5) 농도는 {air_pollution_data['list'][0]['components']['pm2_5']:.1f}입니다."
+        air_pollution_response = f"{country_name}의 미세먼지(PM10) 농도는 {air_pollution_data['list'][0]['components']['pm10']:.1f}, 초미세먼지(PM2.5) 농도는 {air_pollution_data['list'][0]['components']['pm2_5']:.1f}입니다."
     else:
         air_pollution_response = f"미세먼지 정보를 가져올 수 없습니다: {air_pollution_data.get('message', '알 수 없는 오류')}."
 
@@ -423,6 +417,7 @@ def respond():
                         weather_api_response = weather_api(country_name)
                         responses.append(weather_api_response)
                         break
+                return jsonify({"response": '지원하지 않는 국가입니다. 다른 국가를 입력해 주세요.'})
                 
         # Air Pollution API 호출
             elif intent == "air_pollution_request":
@@ -431,6 +426,7 @@ def respond():
                         air_pollution_api_response = air_pollution_api(country_name)
                         responses.append(air_pollution_api_response)
                         break
+                return jsonify({"response": '지원하지 않는 국가입니다. 다른 국가를 입력해 주세요.'})
         
             elif intent == "help_request":
                 responses.append("무엇을 도와드릴까요?")
