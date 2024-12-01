@@ -8,7 +8,7 @@ from hanspell import spell_checker
 import re
 from concurrent.futures import ThreadPoolExecutor
 import random
-import pandas as pd
+
 
 app = Flask(__name__)
 CORS(app)
@@ -562,7 +562,7 @@ def handle_weather_request(keywords):
     for country_name in capital_mapping.keys():
         if country_name in keywords:
             return weather_api(country_name)
-        return "지원하지 않는 국가입니다. 다른 국가를 입력해 주세요."
+    return "지원하지 않는 국가입니다. 다른 국가를 입력해 주세요."
                 
 # Air Pollution API 호출
 def handle_air_pollution_request(keywords):
