@@ -7,6 +7,8 @@ import requests
 from hanspell import spell_checker
 import re
 from concurrent.futures import ThreadPoolExecutor
+import random
+
 
 app = Flask(__name__)
 CORS(app)
@@ -50,8 +52,8 @@ country_code = {
     "유로연합" : "EUR",
     "영국" : "GBP",
     "홍콩" : "HKD",
-    "인도네시아" : "IDR",
-    "일본" : "JPY",
+    "인도네시아" : "IDR(100)",
+    "일본" : "JPY(100)",
     "한국" : "KRW",
     "쿠웨이트" : "KWD",
     "말레이시아" : "MYR",
@@ -61,7 +63,8 @@ country_code = {
     "스웨덴" : "SEK",
     "싱가포르" : "SGD",
     "태국" : "THB",
-    "미국" : "USD"
+    "미국" : "USD",
+    "인도" : "IDR(100)"
 } #국가와 국가코드를 매칭
 
 # 국가명과 수도의 좌표 매핑(Chat GPT 사용)
@@ -203,6 +206,7 @@ capital_mapping = {
     # 다른 국가 추가 가능
 }
 
+
 # 불용어 제거를 위한 조사 리스트
 stopwords = ['은', '는', '이', '가', '을', '를', '에', '의', '에서', '도', '으로', '하다']
 
@@ -213,7 +217,9 @@ intents = {
     "help_request": ["도와줘", "도움", "어떻게"],
     "exchange_rate_request": ["환율", "환율정보", "환전"], #환율 정보 API 키워드(박재우)
     "weather_request": ["날씨", "기온", "온도"],
-    "air_pollution_request": ["대기오염", "미세먼지", "초미세먼지"]
+    "air_pollution_request": ["대기오염", "미세먼지", "초미세먼지"],
+    "menu_request" : ["메뉴추천", "메뉴", "저녁추천", "아침추천", "점심추천"],
+    "menu_type" : ["국", "밥", "후식", "반찬"]
 }
 
 # 마침표,물음표,마침표 기준으로 문장 분리
@@ -356,7 +362,13 @@ def respond():
             elif intent == "weather_request":
                 weather_response = handle_weather_request(keywords)
                 sentence_responses.append(weather_response)
-
+            
+            elif intent == "menu_request":
+                sentence_responses.append("반찬, 국, 밥, 후식 중 어떤 종류의 메뉴를 원하시나요?")
+                
+            elif intent == "menu_type":
+                mene_response = recommend_dish(keywords)
+                sentence_responses.append(mene_response)
             elif intent == "air_pollution_request":
                 air_pollution_response = handle_air_pollution_request(keywords)
                 sentence_responses.append(air_pollution_response)
@@ -449,6 +461,102 @@ def handle_exchange_rate_request(keywords):
         else:
             return("해당 국가의 환율 정보를 찾을 수 없습니다.")
         
+def get_menu(menu_type):
+    
+    # API 호출 URL
+    api_url = f"http://openapi.foodsafetykorea.go.kr/api/d6445d618d4144e3b868/COOKRCP01/json/1/99/"
+    try:
+            response = requests.get(api_url, verify=False)
+            response.raise_for_status()  # HTTP 오류 발생 시 예외 발생
+            data = response.json()
+
+            # 응답 데이터 구조 확인
+            
+    except requests.exceptions.RequestException as e:
+        return [f"API 요청 중 오류 발생: {e}"]
+    menu_items = []
+        
+    # 응답 데이터 구조 확인 후 필터링
+    if 'COOKRCP01' in data:
+        if 'row' in data['COOKRCP01']:
+            for row in data['COOKRCP01']['row']:
+                menu_name = row.get('RCP_NM', '알 수 없는 메뉴')
+                menu_items.append(menu_name)
+        else:
+            return ("응답에 'row' 키가 없습니다.")
+    else:
+        return("응답에 'COOKRCP01' 키가 없습니다.")
+    
+    if not menu_items:
+        return ("메뉴가 없습니다.")
+    
+    # 랜덤으로 메뉴 추천
+    if menu_items:
+        return random.choice(menu_items)
+    else:
+        return (f"메뉴 정보를 불러올 수 없습니다.{menu_items}")
+    
+
+def get_recipe(menu_name):
+    # 메뉴 이름을 기반으로 레시피를 검색하는 기능을 추가
+    api_url = f"http://openapi.foodsafetykorea.go.kr/api/d6445d618d4144e3b868/COOKRCP01/json/1/99?RCP_NM={menu_name}"
+    
+    # API 요청
+    response = requests.get(api_url, verify=False)
+    response.raise_for_status()  # 응답 상태 확인
+    # JSON 데이터 파싱
+    data = response.json()
+    
+    # 레시피 정보를 추출 (여기서는 여러 항목을 포함)
+    recipe_data = None
+    if 'COOKRCP01' in data and 'row' in data['COOKRCP01']:
+        for row in data['COOKRCP01']['row']:
+            if row.get('RCP_NM') == menu_name:
+                recipe_data = {
+                    '조리법': [row.get(f'MANUAL{i:02d}', '') for i in range(1, 21)],
+                    '재료': row.get('RCP_PARTS_DTLS', '재료 정보 없음'),
+                    '열량': row.get('INFO_ENG', '열량 정보 없음'),
+                    '탄수화물': row.get('INFO_CAR', '탄수화물 정보 없음'),
+                    '단백질': row.get('INFO_PRO', '단백질 정보 없음'),
+                    '지방': row.get('INFO_FAT', '지방 정보 없음'),
+                    '나트륨': row.get('INFO_NA', '나트륨 정보 없음')
+                }
+                break
+    
+    if recipe_data:
+        return recipe_data
+    else:
+        return (f"레시피 정보를 찾을 수 없습니다.{menu_name}")
+
+menu_type_DB = {
+    "밥" : "밥",
+    "국" : "국",
+    "후식" : "후식" ,
+    "반찬" : "반찬"
+}
+
+def recommend_dish(menu_type):
+    
+    for menu in menu_type_DB.keys():
+        if menu in menu_type:
+            recommended_menu = get_menu(menu_type)
+            # 레시피 보기 여부
+            recipe = get_recipe(recommended_menu)
+
+            # 레시피 출력
+            if isinstance(recipe, dict):
+                return(
+                    f"추천된 메뉴: {recommended_menu}\n"
+                    f"{recommended_menu}의 레시피:\n"
+                    f"조리법:"
+                    f"\n재료: {recipe['재료']}\n"
+                    f"{recipe['조리법']}\n"
+                    f"열량: {recipe['열량']}, 탄수화물: {recipe['탄수화물']}, 단백질: {recipe['단백질']}, 지방: {recipe['지방']}, 나트륨: {recipe['나트륨']}\n"
+                )
+            else:
+                return(recipe)
+            
+
 # Weather API 호출
 def handle_weather_request(keywords):
     for country_name in capital_mapping.keys():
