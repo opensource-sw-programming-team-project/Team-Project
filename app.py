@@ -214,11 +214,15 @@ stopwords = ['은', '는', '이', '가', '을', '를', '에', '의', '에서', '
 # 키워드 정의 딕셔너리
 intents = {
     "greeting": ["안녕", "하이", "안녕하세요", "ㅎㅇ"],
+    "emotion_joy_request": ["행복하다", "행복해", "행복했어", "기쁘다", "기뻐", "기뻤어"],
+    "emotion_sadness_request": ["슬프다", "슬퍼", "슬펐어", "속상하다", "속상해", "속상했어", "ㅜㅜ", "ㅠㅠ"],
+    "emotion_anger_request": ["화난다", "화나", "화났어"],
+    "emotion_boredom_request": ["지루하다", "지루해", "지루했어", "심심하다", "심심해", "심심했어"],
     "time_request": ["몇 시", "시간", "몇시"],
     "help_request": ["도와줘", "도움", "어떻게"],
     "exchange_rate_request": ["환율", "환율정보", "환전"], #환율 정보 API 키워드(박재우)
     "weather_request": ["날씨", "기온", "온도"],
-    "air_pollution_request": ["대기오염", "공기질", "미세먼지", "초미세먼지"],
+    "air_pollution_request": ["대기오염", "공기", "미세먼지", "초미세먼지"],
     "menu_request" : ["메뉴추천", "메뉴", "저녁추천", "아침추천", "점심추천"],
     "menu_type" : ["국", "밥", "후식", "반찬"],
     "random_book_request" : ["책", "도서"],
@@ -336,25 +340,45 @@ def load_data(filename):
         content = file.read()
         return ast.literal_eval(content)
 
+# 기쁜 감정에 대한 응답 함수
+def emotion_joy(data):
+    joy = random.choice(data)
+    return joy
+
+# 슬픈 감정에 대한 응답 함수
+def emotion_sadness(data):
+    sadness = random.choice(data)
+    return sadness
+
+# 분노한 감정에 대한 응답 함수
+def emotion_anger(data):
+    anger = random.choice(data)
+    return anger
+
+# 지루한 감정에 대한 응답 함수
+def emotion_boredom(data):
+    boredom = random.choice(data)
+    return boredom
+
 # 오늘의 책 함수
 def random_book(data):
     book = random.choice(data)
-    return f"오늘의 책은 {book['저자']}의 '{book['제목']}'입니다."
+    return f"오늘의 책📚\n{book['저자']}의 '{book['제목']}'"
 
 # 오늘의 운세 함수
 def random_fortune_telling(data):
     fortune_telling = random.choice(data)
-    return fortune_telling
+    return f"오늘의 운세🔮\n{fortune_telling}"
 
 # 오늘의 영화 함수
 def random_movie(data):
     movie = random.choice(data)
-    return f"오늘의 영화는 {movie['감독']} 감독의 '{movie['제목']}'입니다."
+    return f"오늘의 영화🎬\n{movie['감독']} 감독의 '{movie['제목']}'"
 
 # 오늘의 음악 함수
 def random_music(data):
     music = random.choice(data)
-    return f"오늘의 노래는 {music['가수']}의 '{music['제목']}'입니다."
+    return f"오늘의 음악🎶\n{music['가수']}의 '{music['제목']}'"
 
 @app.route('/message', methods=['POST'])
 def respond():
@@ -382,6 +406,26 @@ def respond():
             if intent == "greeting":
                 sentence_responses.append("안녕하세요! 반갑습니다.")
 
+            elif intent == "emotion_joy_request":
+                emotion_joy_data = load_data('emotion_joy_list.txt')
+                emotion_joy_response = emotion_joy(emotion_joy_data)
+                sentence_responses.append(emotion_joy_response)
+
+            elif intent == "emotion_sadness_request":
+                emotion_sadness_data = load_data('emotion_sadness_list.txt')
+                emotion_sadness_response = emotion_sadness(emotion_sadness_data)
+                sentence_responses.append(emotion_sadness_response)
+
+            elif intent == "emotion_anger_request":
+                emotion_anger_data = load_data('emotion_anger_list.txt')
+                emotion_anger_response = emotion_anger(emotion_anger_data)
+                sentence_responses.append(emotion_anger_response)
+
+            elif intent == "emotion_boredom_request":
+                emotion_boredom_data = load_data('emotion_boredom_list.txt')
+                emotion_boredom_response = emotion_boredom(emotion_boredom_data)
+                sentence_responses.append(emotion_boredom_response)
+
             elif intent == "time_request":
                 time_response = handle_time_request(keywords)
                 sentence_responses.append(time_response)
@@ -389,10 +433,6 @@ def respond():
             elif intent == "exchange_rate_request":
                 exchange_rate_response = handle_exchange_rate_request(keywords)
                 sentence_responses.append(exchange_rate_response)
-
-            elif intent == "weather_request":
-                weather_response = handle_weather_request(keywords)
-                sentence_responses.append(weather_response)
             
             elif intent == "menu_request":
                 sentence_responses.append("반찬, 국, 밥, 후식 중 어떤 종류의 메뉴를 원하시나요?")
@@ -400,6 +440,11 @@ def respond():
             elif intent == "menu_type":
                 mene_response = recommend_dish(keywords)
                 sentence_responses.append(mene_response)
+
+            elif intent == "weather_request":
+                weather_response = handle_weather_request(keywords)
+                sentence_responses.append(weather_response)
+            
             elif intent == "air_pollution_request":
                 air_pollution_response = handle_air_pollution_request(keywords)
                 sentence_responses.append(air_pollution_response)
