@@ -8,6 +8,7 @@ from hanspell import spell_checker
 import re
 from concurrent.futures import ThreadPoolExecutor
 import random
+import ast
 
 
 app = Flask(__name__)
@@ -212,14 +213,18 @@ stopwords = ['은', '는', '이', '가', '을', '를', '에', '의', '에서', '
 
 # 키워드 정의 딕셔너리
 intents = {
-    "greeting": ["안녕", "하이", "안녕하세요"],
+    "greeting": ["안녕", "하이", "안녕하세요", "ㅎㅇ"],
     "time_request": ["몇 시", "시간", "몇시"],
     "help_request": ["도와줘", "도움", "어떻게"],
     "exchange_rate_request": ["환율", "환율정보", "환전"], #환율 정보 API 키워드(박재우)
     "weather_request": ["날씨", "기온", "온도"],
-    "air_pollution_request": ["대기오염", "미세먼지", "초미세먼지"],
+    "air_pollution_request": ["대기오염", "공기질", "미세먼지", "초미세먼지"],
     "menu_request" : ["메뉴추천", "메뉴", "저녁추천", "아침추천", "점심추천"],
-    "menu_type" : ["국", "밥", "후식", "반찬"]
+    "menu_type" : ["국", "밥", "후식", "반찬"],
+    "random_book_request" : ["책", "도서"],
+    "random_fortune_telling_request" : ["운세"],
+    "random_movie_request" : ["영화"],
+    "random_music_request" : ["음악", "노래"]
 }
 
 # 마침표,물음표,마침표 기준으로 문장 분리
@@ -271,7 +276,7 @@ def detect_intent(text):
             return intent
     return "unknown"
 
-# Weather API
+# Weather API 함수
 def weather_api(country_name):
     # OpenWeatherMap API Key
     api_key = '76709f4e1bf2023762668cf9b449c3b3'
@@ -292,13 +297,13 @@ def weather_api(country_name):
 
     # 질문에 따른 응답 생성
     if weather_information.status_code == 200:
-        weather_response = f"{country_name}의 날씨는 {weather_data['weather'][0]['description']}, 기온은 {weather_data['main']['temp'] - 273.15:.1f}°C입니다."
+        weather_response = f"{country_name}의 현재 날씨는 {weather_data['weather'][0]['description']}, 기온은 {weather_data['main']['temp'] - 273.15:.1f}°C입니다."
     else:
         weather_response = f"날씨 정보를 가져올 수 없습니다: {weather_data.get('message', '알 수 없는 오류')}."
 
     return weather_response
 
-# Air Pollution API
+# Air Pollution API 함수
 def air_pollution_api(country_name):
     # OpenWeatherMap API Key
     api_key = '76709f4e1bf2023762668cf9b449c3b3'
@@ -319,11 +324,37 @@ def air_pollution_api(country_name):
 
    # 질문에 따른 응답 생성
     if air_pollution_information.status_code == 200:
-        air_pollution_response = f"{country_name}의 미세먼지(PM10) 농도는 {air_pollution_data['list'][0]['components']['pm10']:.1f}, 초미세먼지(PM2.5) 농도는 {air_pollution_data['list'][0]['components']['pm2_5']:.1f}입니다."
+        air_pollution_response = f"{country_name}의 현재 미세먼지(PM10) 농도는 {air_pollution_data['list'][0]['components']['pm10']:.1f}, 초미세먼지(PM2.5) 농도는 {air_pollution_data['list'][0]['components']['pm2_5']:.1f}입니다."
     else:
         air_pollution_response = f"미세먼지 정보를 가져올 수 없습니다: {air_pollution_data.get('message', '알 수 없는 오류')}."
 
     return air_pollution_response
+
+# 파일의 딕셔너리를 읽는 함수
+def load_data(filename):
+    with open(filename, 'r', encoding='utf-8') as file:
+        content = file.read()
+        return ast.literal_eval(content)  # 문자열을 Python 객체로 변환
+
+# 오늘의 책 함수
+def random_book(data):
+    book = random.choice(data)
+    return f"오늘의 책은 {book['저자']}의 '{book['제목']}'입니다."
+
+# 오늘의 운세 함수
+def random_fortune_telling(data):
+    fortune_telling = random.choice(data)
+    return fortune_telling
+
+# 오늘의 영화 함수
+def random_movie(data):
+    movie = random.choice(data)
+    return f"오늘의 영화는 {movie['감독']} 감독의 '{movie['제목']}'입니다."
+
+# 오늘의 음악 함수
+def random_music(data):
+    music = random.choice(data)
+    return f"오늘의 노래는 {music['가수']}의 '{music['제목']}'입니다."
 
 @app.route('/message', methods=['POST'])
 def respond():
@@ -375,6 +406,26 @@ def respond():
 
             elif intent == "help_request":
                 sentence_responses.append("무엇을 도와드릴까요?")
+
+            elif intent == "random_book_request":
+                book_data = load_data('book_list.txt')
+                random_book_response = random_book(book_data)
+                sentence_responses.append(random_book_response)
+
+            elif intent == "random_fortune_telling_request":
+                fortune_telling_data = load_data('fortune_telling_list.txt')
+                random_fortune_telling_response = random_fortune_telling(fortune_telling_data)
+                sentence_responses.append(random_fortune_telling_response)
+
+            elif intent == "random_movie_request":
+                movie_data = load_data('movie_list.txt')
+                random_movie_response = random_movie(movie_data)
+                sentence_responses.append(random_movie_response)
+
+            elif intent == "random_music_request":
+                music_data = load_data('music_list.txt')
+                random_music_response = random_music(music_data)
+                sentence_responses.append(random_music_response)
 
             else:
                 sentence_responses.append("알 수 없는 메시지입니다.")
@@ -557,20 +608,19 @@ def recommend_dish(menu_type):
                 return(recipe)
             
 
-# Weather API 호출
+# Weather API 호출 함수
 def handle_weather_request(keywords):
     for country_name in capital_mapping.keys():
         if country_name in keywords:
             return weather_api(country_name)
     return "지원하지 않는 국가입니다. 다른 국가를 입력해 주세요."
                 
-# Air Pollution API 호출
+# Air Pollution API 호출 함수
 def handle_air_pollution_request(keywords):
     for country_name in capital_mapping.keys():
         if country_name in keywords:
             return air_pollution_api(country_name)
     return "지원하지 않는 국가입니다. 다른 국가를 입력해 주세요."
-
 
 if __name__ == '__main__':
     app.run(debug=True)
