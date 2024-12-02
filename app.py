@@ -9,6 +9,9 @@ import re
 from concurrent.futures import ThreadPoolExecutor
 import random
 import ast
+from gensim.models import Word2Vec
+from sklearn.metrics.pairwise import cosine_similarity
+import numpy as np
 
 
 app = Flask(__name__)
@@ -208,9 +211,6 @@ capital_mapping = {
 }
 
 
-# 불용어 제거를 위한 조사 리스트
-stopwords = ['은', '는', '이', '가', '을', '를', '에', '의', '에서', '도', '으로', '하다']
-
 # 키워드 정의 딕셔너리
 intents = {
     "greeting": ["안녕", "하이", "안녕하세요", "ㅎㅇ"],
@@ -226,11 +226,60 @@ intents = {
     "random_movie_request" : ["영화"],
     "random_music_request" : ["음악", "노래"]
 }
+# 키워드 추출 및 불용어 제거
+def extract_keywords(text):
+    tokens = okt.morphs(text)
+    stopwords = ['은', '는', '이', '가', '을', '를', '에', '의', '에서', '도', '으로', '하다']
+    keywords = [word for word in tokens if word not in stopwords]
+    return keywords
 
+# intents의 단어들 토큰화
+sentences = []
+for keywords in intents.values():
+    for sentence in keywords:
+        sentences.append(extract_keywords(sentence))
+
+# Word2Vec 모델 학습
+model = Word2Vec(list(intents.values()), vector_size=50, window=3, min_count=1, workers=4)
+
+# 단어 벡터 생성
+def get_word_vector(word, model):
+    try:
+        return model.wv[word]
+    except KeyError:
+        return np.zeros(model.vector_size)
+
+# 입력과 각 의도 간 유사도 계산
+def calculate_intent_similarity(user_input):
+    user_words = extract_keywords(user_input)
+    user_vectors = [get_word_vector(word, model) for word in user_words]
+    
+    best_intent = None
+    max_similarity = 0
+    threshold=0.5
+
+    for intent, keywords in intents.items():
+        intent_vectors = [get_word_vector(word, model) for word in keywords]
+        
+        # 유사도 계산
+        similarities = []
+        for user_vector in user_vectors:
+            for intent_vector in intent_vectors:
+                if np.linalg.norm(user_vector) != 0 and np.linalg.norm(intent_vector) != 0:
+                    similarity = cosine_similarity([user_vector], [intent_vector])[0][0]
+                    similarities.append(similarity)
+
+        if similarities and max(similarities) > max_similarity and max(similarities) >= threshold:
+            max_similarity = max(similarities)
+            best_intent = intent
+    return best_intent
+
+    
 # 마침표,물음표,마침표 기준으로 문장 분리
 def split_sentences(text):
     sentences = re.split(r'(?<=[.?!,])\s+', text.strip())
     return sentences
+
 # 연결어를 포함한 명사-조사 결합 분리
 def split_with_morpheme(sentence):
     tokens = okt.pos(sentence)
@@ -259,22 +308,11 @@ def split_with_connectors_and_morpheme(sentence):
     if current_part:
         results.append(" ".join(current_part))
     return results
+
+#오타 및 맞춤법 교정
 def spellcheck(text):
     correct_message = spell_checker.check(text)
     return correct_message.checked
-# 키워드 추출 및 불용어 제거
-def extract_keywords(text):
-    tokens = okt.morphs(text)
-    keywords = [word for word in tokens if word not in stopwords]
-    return keywords
-
-# 의도 분류
-def detect_intent(text):
-    tokens = extract_keywords(text)
-    for intent, keywords in intents.items():
-        if any(keyword in tokens for keyword in keywords):
-            return intent
-    return "unknown"
 
 # Weather API 함수
 def weather_api(country_name):
@@ -376,7 +414,7 @@ def respond():
             keywords = extract_keywords(part)
 
             # 사용자 의도 파악
-            intent = detect_intent(part)
+            intent = calculate_intent_similarity(part)
 
             # 의도에 따른 응답
             if intent == "greeting":
