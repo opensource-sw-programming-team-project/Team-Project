@@ -330,11 +330,11 @@ def air_pollution_api(country_name):
 
     return air_pollution_response
 
-# 파일의 딕셔너리를 읽는 함수
+# 파일의 문자열을 Python 객체로 변환하는 함수
 def load_data(filename):
     with open(filename, 'r', encoding='utf-8') as file:
         content = file.read()
-        return ast.literal_eval(content)  # 문자열을 Python 객체로 변환
+        return ast.literal_eval(content)
 
 # 오늘의 책 함수
 def random_book(data):
