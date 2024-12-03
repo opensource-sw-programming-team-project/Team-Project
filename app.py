@@ -1,7 +1,7 @@
 from flask import Flask, jsonify, request
 from flask_cors import CORS
-from datetime import datetime #재우님
-from konlpy.tag import Okt #종명
+from datetime import datetime
+from konlpy.tag import Okt
 import time
 import requests
 from hanspell import spell_checker
@@ -10,7 +10,20 @@ from concurrent.futures import ThreadPoolExecutor
 import random
 
 from data_store import(
+    time_zones,
+    country_code,
+    capital_mapping,
+    stopwords,
+    intents,
+    menu_type_DB,
     book_list,
+    movie_list,
+    music_list,
+    fortune_telling_list,
+    emotion_anger_list,
+    emotion_boredom_list,
+    emotion_joy_list,
+    emotion_sadness_list,
 )
 
 
@@ -157,65 +170,63 @@ def respond():
     # 문장 분리
     sentences = split_sentences(correct_message)
 
-    response_text = process_sentence(sentences)
-    return jsonify({"response": response_text})
-
-# 문장 처리 함수 정의
-def process_sentence(sentences):
-    response_list = []
-    for sentence in sentences:
-        # 사용자 메시지에서 불용어 제거 후 키워드 추출
-        keywords = extract_keywords(sentence)
-        # 사용자 의도 파악
-        intent = detect_intent(sentence)
-        # 의도에 따른 응답
-        if intent == "greeting": # 안녕
-            response_list.append("안녕하세요! 반갑습니다.")
-        elif intent == "emotion_joy_request": # 즐겁다
-            response_list.append(emotion_joy())
-        elif intent == "emotion_sadness_request": # 슬프다
-            response_list.append(emotion_sadness())
-        elif intent == "emotion_anger_request": # 화난다
-            response_list.append(emotion_anger())
-        elif intent == "emotion_boredom_request": # 지루하다
-            response_list.append(emotion_boredom())
-        elif intent == "time_request": # 시간
-            time_response = handle_time_request(keywords)
-            response_list.append(time_response)
-        elif intent == "exchange_rate_request": # 환율
-            exchange_rate_response = handle_exchange_rate_request(keywords)
-            response_list.append(exchange_rate_response)
-        elif intent == "menu_request": # 저메추
-            response_list.append("반찬, 국, 밥, 후식 중 어떤 종류의 메뉴를 원하시나요?")
-        elif intent == "menu_type": # 메뉴
-            mene_response = recommend_dish(keywords)
-            response_list.append(mene_response)
-        elif intent == "weather_request": # 날씨
-            weather_response = handle_weather_request(keywords)
-            response_list.append(weather_response)
-        elif intent == "air_pollution_request": # 공기오염
-            air_pollution_response = handle_air_pollution_request(keywords)
-            response_list.append(air_pollution_response)
-        elif intent == "help_request": # 도와줘
-            response_list.append("무엇을 도와드릴까요?")
-        elif intent == "random_book_request": # 책
-            response_list.append(random_book())
-        elif intent == "random_fortune_telling_request": # 운세
-            response_list.append(random_fortune_telling())
-        elif intent == "random_movie_request": # 영화
-            response_list.append(random_movie())
-        elif intent == "random_music_request": # 음악
-            response_list.append(random_music())
-        else: # 뭐라는거야
-            response_list.append("알 수 없는 메시지입니다.")
-        
+    # 문장 처리 함수 정의
+    def process_sentence(sentences):
+        parts = split_with_connectors_and_morpheme(sentences)
+        response_list = []
+        for part in parts:
+            # 사용자 메시지에서 불용어 제거 후 키워드 추출
+            keywords = extract_keywords(part)
+            # 사용자 의도 파악
+            intent = detect_intent(part)
+            # 의도에 따른 응답
+            if intent == "greeting": # 안녕
+                response_list.append("안녕하세요! 반갑습니다.")
+            elif intent == "emotion_joy_request": # 즐겁다
+                response_list.append(emotion_joy())
+            elif intent == "emotion_sadness_request": # 슬프다
+                response_list.append(emotion_sadness())
+            elif intent == "emotion_anger_request": # 화난다
+                response_list.append(emotion_anger())
+            elif intent == "emotion_boredom_request": # 지루하다
+                response_list.append(emotion_boredom())
+            elif intent == "time_request": # 시간
+                time_response = handle_time_request(keywords)
+                response_list.append(time_response)
+            elif intent == "exchange_rate_request": # 환율
+                exchange_rate_response = handle_exchange_rate_request(keywords)
+                response_list.append(exchange_rate_response)
+            elif intent == "menu_request": # 저메추
+                response_list.append("반찬, 국, 밥, 후식 중 어떤 종류의 메뉴를 원하시나요?")
+            elif intent == "menu_type": # 메뉴
+                mene_response = recommend_dish(keywords)
+                response_list.append(mene_response)
+            elif intent == "weather_request": # 날씨
+                weather_response = handle_weather_request(keywords)
+                response_list.append(weather_response)
+            elif intent == "air_pollution_request": # 공기오염
+                air_pollution_response = handle_air_pollution_request(keywords)
+                response_list.append(air_pollution_response)
+            elif intent == "help_request": # 도와줘
+                response_list.append("무엇을 도와드릴까요?")
+            elif intent == "random_book_request": # 책
+                response_list.append(random_book())
+            elif intent == "random_fortune_telling_request": # 운세
+                response_list.append(random_fortune_telling())
+            elif intent == "random_movie_request": # 영화
+                response_list.append(random_movie())
+            elif intent == "random_music_request": # 음악
+                response_list.append(random_music())
+            else: # 뭐라는거야
+                response_list.append("알 수 없는 메시지입니다.")
+            
         return "\n".join(response_list)
-        
-    # 병렬 처리
+            
+        # 병렬 처리
     with ThreadPoolExecutor() as executor:
         results = list(executor.map(process_sentence, sentences))
 
-    # 결과 합치기
+        # 결과 합치기
     responses = [str(item).replace("\n", "<br>") for item in results]
     return jsonify({"response": "<br>".join(responses)})
 
@@ -378,7 +389,7 @@ def recommend_dish(menu_type):
                 )
             else:
                 return(recipe)
-            
+
 
 # Weather API 호출 함수
 def handle_weather_request(keywords):
