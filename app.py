@@ -10,7 +10,7 @@ from concurrent.futures import ThreadPoolExecutor
 import random
 
 from data_store import(
-    
+    book_list,
 )
 
 
@@ -357,13 +357,6 @@ def get_recipe(menu_name):
         return recipe_data
     else:
         return (f"레시피 정보를 찾을 수 없습니다.{menu_name}")
-
-menu_type_DB = {
-    "밥" : "밥",
-    "국" : "국",
-    "후식" : "후식" ,
-    "반찬" : "반찬"
-}
 
 def recommend_dish(menu_type):
     
