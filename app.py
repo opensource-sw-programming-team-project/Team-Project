@@ -226,8 +226,8 @@ intents = {
     "random_movie_request" : ["영화"],
     "random_music_request" : ["음악", "노래"]
 }
-# 키워드 추출 및 불용어 제거
-def extract_keywords(text):
+# 전처리 함수(불용어 제거)
+def preprocess(text):
     tokens = okt.morphs(text)
     stopwords = ['은', '는', '이', '가', '을', '를', '에', '의', '에서', '도', '으로', '하다']
     keywords = [word for word in tokens if word not in stopwords]
@@ -237,7 +237,7 @@ def extract_keywords(text):
 sentences = []
 for keywords in intents.values():
     for sentence in keywords:
-        sentences.append(extract_keywords(sentence))
+        sentences.append(preprocess(sentence))
 
 # Word2Vec 모델 학습
 model = Word2Vec(list(intents.values()), vector_size=50, window=3, min_count=1, workers=4)
@@ -251,7 +251,7 @@ def get_word_vector(word, model):
 
 # 입력과 각 의도 간 유사도 계산
 def calculate_intent_similarity(user_input):
-    user_words = extract_keywords(user_input)
+    user_words = preprocess(user_input)
     user_vectors = [get_word_vector(word, model) for word in user_words]
     
     best_intent = None
@@ -411,7 +411,7 @@ def respond():
         sentence_responses = []
         for part in parts:
             # 사용자 메시지에서 불용어 제거 후 키워드 추출
-            keywords = extract_keywords(part)
+            keywords = preprocess(part)
 
             # 사용자 의도 파악
             intent = calculate_intent_similarity(part)
