@@ -48,7 +48,7 @@ def write_to_data_store(file_path, list_name, updated_data, new_list_name=None):
 
         file_content = ''.join(new_content)
 
-    with open(file_path, 'w', encoding='utf-8') as file:
+    with open(file_path, 'a', encoding='utf-8') as file:
         file.write(file_content)
 
 # 중복 제거 및 업데이트 처리 함수
@@ -61,7 +61,7 @@ def update_data_store(existing_data, new_data, choice, list_name, data_store_pat
         combined_data = existing_data + new_data
 
         for item in combined_data:
-            key = f"{item['제목']}"  # 각 항목의 고유 키 정의
+            key = f"{item['제목']} & {item['감독']}"  # 각 항목의 고유 키 정의
             if key not in seen_keys:
                 seen_keys.add(key)
                 unique_data.append(item)
@@ -81,7 +81,7 @@ def update_data_store(existing_data, new_data, choice, list_name, data_store_pat
 
     elif choice == "2":
         # 새로운 리스트 이름 받기
-        new_list_name = "emotion_anger_list"
+        new_list_name = "movie_list"
         
         # 10줄마다 줄바꿈 처리하며 새로운 리스트 포맷팅
         formatted_list = f"{new_list_name} = [\n"
@@ -93,7 +93,7 @@ def update_data_store(existing_data, new_data, choice, list_name, data_store_pat
 
         # 파일 끝에 새 리스트 추가
         with open(data_store_path, 'a', encoding='utf-8') as data_store_file:
-            data_store_file.write("\n# 화난 감정 리스트\n")
+            data_store_file.write("\n# 영화 리스트\n")
             data_store_file.write(formatted_list)
         print("새 리스트가 추가됨")
 
@@ -103,7 +103,7 @@ if __name__ == "__main__":
     existing_data = read_existing_lists(data_store_path, list_name)
 
     # 새 데이터 읽기
-    new_data = read_new_data('emotion_anger_list.txt')
+    new_data = read_new_data('movie_list.txt')
 
     # 사용자 선택
     print("데이터 추가 방식 선택:")
