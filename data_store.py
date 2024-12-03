@@ -207,18 +207,13 @@ intents = {
     "air_pollution_request": ["대기오염", "공기", "미세먼지", "초미세먼지"],
     "menu_request" : ["메뉴추천", "메뉴", "저녁추천", "아침추천", "점심추천"],
     "menu_type" : ["국", "밥", "후식", "반찬"],
+    "menu_recipe" : ["레시피", "어", "예", "볼래", "보겠습니다", "보다"],
     "random_book_request" : ["책", "도서"],
     "random_fortune_telling_request" : ["운세"],
     "random_movie_request" : ["영화"],
     "random_music_request" : ["음악", "노래"]
 }
 
-menu_type_DB = {
-    "밥" : "밥",
-    "국" : "국",
-    "후식" : "후식" ,
-    "반찬" : "반찬"
-}
 # 책 리스트
 book_list = [
     {'제목': '햄릿', '저자': '윌리엄 셰익스피어'},
@@ -625,3 +620,5 @@ emotion_sadness_list = [
     '그런 일이 있었다니 마음이 아프네요. 힘내세요.',
     '속상하시겠어요. 제가 도울 수 있는 게 있으면 말해주세요.',
 ]
+
+
