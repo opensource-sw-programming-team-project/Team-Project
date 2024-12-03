@@ -206,11 +206,12 @@ def respond():
     # 오타 및 맞춤법 검사
     correct_message = spellcheck(user_message)
 
-    # 문장 분리
+    # 문장부호를 기준으로 문장 분리
     sentences = split_sentences(correct_message)
 
     # 문장 처리 함수 정의
     def process_sentence(sentences):
+        #연결어를 기준으로 문장 분리
         parts = split_with_connectors_and_morpheme(sentences)
         response_list = []
         for part in parts:
@@ -218,7 +219,7 @@ def respond():
             keywords = preprocess(part)
 
             # 사용자 의도 파악
-            intent = preprocess(part)
+            intent = calculate_intent_similarity(part)
 
             # 의도에 따른 응답
             if intent == "greeting": # 안녕
