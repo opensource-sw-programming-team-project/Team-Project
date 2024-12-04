@@ -220,7 +220,8 @@ intents = {
     "random_movie_request" : ["영화"],
     "random_drama_request" : ["드라마"],
     "random_webtoon_request" : ["웹툰"],
-    "random_music_request" : ["음악", "노래"]
+    "random_music_request" : ["음악", "노래"],
+    "random_joke_request" : ["농담", "유머"]
 }
 
 # 책 리스트
@@ -1346,4 +1347,51 @@ webtoon_list = [
     {'제목': '유령의 노래', '작가': '김문경'},
     {'제목': '이매망량', '작가': '관절'}
     # 다른 웹툰 추가 가능
+]
+jokes = [
+    {"question": "전투기 조종사들이 제일 무서워하는 것은?", "answer": "대공포"},
+    {"question": "세발낙지가 탈모가 오면?", "answer": "한발낙지(두발이 없어져서)"},
+    {"question": "토끼가 강한 이유는?", "answer": "깡과 총이 있어서"},
+    {"question": "개가 재채기를 하면?", "answer": "개추"},
+    {"question": "흡혈귀들이 식탁에서 웃음이 끊이질 않는 이유는?", "answer": "피 식(食)"},
+    {"question": "스님이 택시를 타고 한 말은?", "answer": "절로가"},
+    {"question": "0과 1로만 구성된 열차는?", "answer": "binary는 호남선~ 남행열차에"},
+    {"question": "심마니에게 집 주소를 물으면 돌아오는 대답은?", "answer": "산삼"},
+    {"question": "마블보다 4배 큰 국내 기업은?", "answer": "넷마블"},
+    {"question": "녹색은 무슨 색?", "answer": "갈색"},
+    {"question": "어떤 혈액형의 경찰관이 제일 많을까?", "answer": "B형~ B형~"},
+    {"question": "삼행시 운 띄우다가 실수했을 때 하는 행동은?", "answer": "새로운 시작"},
+    {"question": "송아지가 미국에 가면 온순해지는 이유는?", "answer": "아 지송"},
+    {"question": "오리가 옳다고 인정하면?", "answer": "덕수긍"},
+    {"question": "차 열쇠 색깔은?", "answer": "카키색"},
+    {"question": "다정함의 반대말은?", "answer": "선택 장애"},
+    {"question": "일본인들이 달걀을 먹기 시작한 시기는?", "answer": "a long たまご"},
+    {"question": "유모차 타면 긴장되는 이유는?", "answer": "애가 타서"},
+    {"question": "랩몬스터가 죽으면?", "answer": "고랩 몬스터"},
+    {"question": "래퍼가 헌혈하면 경찰서에 잡혀가는 이유는?", "answer": "Rapper 래퍼가 피(p)를 빼면 raper가 되기 때문"},
+    {"question": "DNA가 복제될 때 나는 소리는?", "answer": "딸 가닥(daughter strand)"},
+    {"question": "바람의 엉덩이를 부르는 말은?", "answer": "풍뎅이"},
+    {"question": "친일파 동물을 뭐라고 하나?", "answer": "애완용"},
+    {"question": "미국과 러시아가 싸우면 승패를 가늠할 수 없는 이유는?", "answer": "미러(mirror) 전이기 때문"},
+    {"question": "문신을 지우는 방법은?", "answer": "무신정변"},
+    {"question": "고양이한테 '야옹'이라고 하면 뭐라고 답할까?", "answer": "왜옹"},
+    {"question": "심영이 러시아로 귀화하면?", "answer": "알파인스키"},
+    {"question": "청바지를 돋보이게 하는 걸음걸이는?", "answer": "진주목걸이"},
+    {"question": "시험 끝나면 친구들끼리 회식하는 곤충은?", "answer": "반뒤풀이"},
+    {"question": "개들이 제일 싫어하는 절은?", "answer": "보신각"},
+    {"question": "김구는 소를 몇 마리 기를까?", "answer": "나의 소one"},
+    {"question": "일본인이 차범근을 응원할 땐 뭐라 할까?", "answer": "간발의 차"},
+    {"question": "은행원들은 파란색을 좋아하는 이유는?", "answer": "청 약해지가 싫어서"},
+    {"question": "레스토랑에서 스튜를 주문했는데 안 나오면 하는 말은?", "answer": "스튜어디스"},
+    {"question": "털이 길게 자란 남자를 4자로?", "answer": "모자란 놈"},
+    {"question": "러시아 사람이 점프하면?", "answer": "스키점프"},
+    {"question": "나방의 어머니뻘 되는 동물은?", "answer": "맘모스"},
+    {"question": "파워포인트가 목이 없으면?", "answer": "제 목을 입력해주세요"},
+    {"question": "천을 서로 비비면?", "answer": "천문대"},
+    {"question": "흑인들이 성교육을 일찍 받는 이유는?", "answer": "엄마가 다크면 알려준다고 해서"},
+    {"question": "레이저 총이 안 맞는 이유는?", "answer": "총이 빛나가서"},
+    {"question": "투명인간은 몇 명이나 있을까?", "answer": "2명"},
+    {"question": "속이 안 좋은 레슬링 선수는?", "answer": "더 부룩 레스너"},
+    {"question": "금요일에 이사 가는 것을 5자로?", "answer": "새마을 금고"},
+    {"question": "우연히 좋은 일이 생겼을 때 마시는 차는?", "answer": "헛 개꿀 차"}
 ]
