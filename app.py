@@ -154,9 +154,9 @@ def weather_api(country_name):
 
     # 질문에 따른 응답 생성
     if weather_information.status_code == 200:
-        weather_response = f"{country_name}의 현재 날씨는 {weather_data['weather'][0]['description']}, 기온은 {weather_data['main']['temp'] - 273.15:.1f}°C입니다."
+        weather_response = f"{country_name}의 현재 날씨는 {weather_data['weather'][0]['description']}, 기온은 {weather_data['main']['temp'] - 273.15:.1f}°C에요."
     else:
-        weather_response = f"날씨 정보를 가져올 수 없습니다: {weather_data.get('message', '알 수 없는 오류')}."
+        weather_response = f"지금 날씨 정보를 가져올 수 없어요...: {weather_data.get('message', '알 수 없는 오류')}."
 
     return weather_response
 
@@ -181,9 +181,9 @@ def air_pollution_api(country_name):
 
    # 질문에 따른 응답 생성
     if air_pollution_information.status_code == 200:
-        air_pollution_response = f"{country_name}의 현재 미세먼지(PM10) 농도는 {air_pollution_data['list'][0]['components']['pm10']:.1f}, 초미세먼지(PM2.5) 농도는 {air_pollution_data['list'][0]['components']['pm2_5']:.1f}입니다."
+        air_pollution_response = f"{country_name}의 현재 미세먼지(PM10) 농도는 {air_pollution_data['list'][0]['components']['pm10']:.1f}, 초미세먼지(PM2.5) 농도는 {air_pollution_data['list'][0]['components']['pm2_5']:.1f}에요."
     else:
-        air_pollution_response = f"미세먼지 정보를 가져올 수 없습니다: {air_pollution_data.get('message', '알 수 없는 오류')}."
+        air_pollution_response = f"지금 미세먼지 정보를 가져올 수 없어요...: {air_pollution_data.get('message', '알 수 없는 오류')}."
 
     return air_pollution_response
 
@@ -198,39 +198,39 @@ def emotion_boredom():
     return random.choice(emotion_boredom_list)
 # 오늘의 운세
 def random_fortune_telling():
-    return f"오늘의 운세🔮\n{random.choice(fortune_telling_list)}"
+    return f"오늘의 운세🔮는~\n{random.choice(fortune_telling_list)}"
 # 오늘의 명언
 def random_famous_saying():
     famous_saying = random.choice(famous_saying_list)
-    return f'오늘의 명언💬\n"{famous_saying["명언"]}", {famous_saying["명언가"]}'
+    return f'오늘의 명언💬은~\n"{famous_saying["명언"]}", {famous_saying["명언가"]}'
 # 오늘의 사자성어
 def random_idiom():
-    return f"오늘의 사자성어💭\n'{random.choice(idiom_list)}'"
+    return f"오늘의 사자성어💭는~\n'{random.choice(idiom_list)}'"
 # 오늘의 속담
 def random_adage_saying():
-    return f"오늘의 속담💭\n'{random.choice(adage_saying_list)}'"
+    return f"오늘의 속담💭은~\n'{random.choice(adage_saying_list)}'"
 # 오늘의 추천 활동
 def random_activity():
-    return f"🏃 오늘의 추천 활동은 '{random.choice(activity_list)}'입니다."
+    return f"🏃 오늘은 '{random.choice(activity_list)}'어때요?"
 # 오늘의 추천 책
 def random_book():
     book = random.choice(book_list)
-    return f"📚 오늘의 추천 책은 {book['저자']}의 '{book['제목']}'입니다."
+    return f"📚 오늘 추천할 책은 {book['저자']}의 '{book['제목']}'(이)에요"
 # 오늘의 추천 영화
 def random_movie():
     movie = random.choice(movie_list)
-    return f"🎬 오늘의 추천 영화는 {movie['감독']} 감독의 '{movie['제목']}'입니다."
+    return f"🎬 오늘의 추천 영화는 {movie['감독']} 감독의 '{movie['제목']}'(이)에요."
 # 오늘의 추천 드라마
 def random_drama():
-    return f"📺 오늘의 추천 드라마는 '{random.choice(drama_list)}'입니다."
+    return f"📺 오늘 정주행 드라마는 '{random.choice(drama_list)}'어때요?"
 # 오늘의 추천 웹툰
 def random_webtoon():
     webtoon = random.choice(webtoon_list)
-    return f"🖌️ 오늘의 추천 웹툰은 {webtoon['작가']} 작가의 '{webtoon['제목']}'입니다."
+    return f"🖌️ 제가 추천 하는 웹툰은 {webtoon['작가']} 작가의 '{webtoon['제목']}'(이)에요 재밌겠죠?"
 # 오늘의 추천 음악
 def random_music():
     music = random.choice(music_list)
-    return f"🎶 오늘의 추천 음악은 {music['가수']}의 '{music['제목']}'입니다."
+    return f"🎶 오늘 당신의 가슴을 울릴 노래는 {music['가수']}의 '{music['제목']}'(이)에요."
 #아재개그
 def random_jokes():
     joke = random.choice(jokes)
@@ -265,7 +265,7 @@ def respond():
             
             # 의도에 따른 응답
             if intent == "greeting": # 안녕
-                response_list.append("안녕하세요! 반갑습니다.")
+                response_list.append("안녕하세요! 반가워요.")
             elif intent == "emotion_joy_request": # 즐겁다
                 response_list.append(emotion_joy())
             elif intent == "emotion_sadness_request": # 슬프다
@@ -328,7 +328,7 @@ def respond():
             elif intent == "random_joke_request": #아재개그
                 response_list.append(random_jokes())
             else: # 뭐라는거야
-                response_list.append("알 수 없는 메시지입니다.")
+                response_list.append("무슨 말씀을 하는 건지 모르겠어요... 다시 말씀해주시겠어요?")
             
         return "\n".join(response_list)
             
@@ -354,13 +354,13 @@ def handle_time_request(keywords):
                 date_part, time_part = formatted_time.split(' ')
                 hour, minute, second = time_part.split(':')
                         
-                return(f"{country}의 현재 시간은 {date_part} {hour}시 {minute}분 {second}초입니다.")
+                return(f"{country}의 현재 시간은 {date_part} {hour}시 {minute}분 {second}초에요.")
                 break
             else:
                 return "시간 정보를 가져오는 데 실패했어요."
     else:
         current_time = datetime.now().strftime("%Y-%m-%d %H시%M분%S초")
-        return(f"현재 시간은 {current_time}입니다.")
+        return(f"지금 시간은 {current_time}에요.")
 
                     
 #환율 정보 API 호출 (박재우)
@@ -400,17 +400,17 @@ def handle_exchange_rate_request(keywords):
                         found = True
                         break
                 if not found:
-                    return("해당 국가의 환율 정보를 찾을 수 없습니다.")
+                    return("해당 국가의 환율 정보를 찾을 수 없어요.")
                         
             except requests.exceptions.RequestException as e:
-                return(f"API요청중 오류가 발생했습니다. 잠시 기다리고 다시 요청해주세요")
+                return(f"API요청중 오류가 발생했어요. 잠시 기다리고 다시 요청해주세요")
                         
             break
     else:
         if country_requested is None:
             return("확실한 국가를 정해서 말해주세요.")
         else:
-            return("해당 국가의 환율 정보를 찾을 수 없습니다.")
+            return("해당 국가의 환율 정보를 찾을 수 없어요.")
         
 def get_menu(menu_type):
     
@@ -434,18 +434,18 @@ def get_menu(menu_type):
                 menu_name = row.get('RCP_NM', '알 수 없는 메뉴')
                 menu_items.append(menu_name)
         else:
-            return (f"응답에 'row' 키가 없습니다.")
+            return (f"응답에 'row' 키가 없어요.")
     else:
-        return("응답에 'COOKRCP01' 키가 없습니다.")
+        return("응답에 'COOKRCP01' 키가 없어요.")
     
     if not menu_items:
-        return ("메뉴가 없습니다.")
+        return ("메뉴가 없어요.")
     
     # 랜덤으로 메뉴 추천
     if menu_items:
         return random.choice(menu_items)
     else:
-        return (f"메뉴 정보를 불러올 수 없습니다.{menu_items}")
+        return (f"메뉴 정보를 불러올 수 없어요.{menu_items}")
     
 
 def get_recipe(menu_name):
@@ -478,7 +478,7 @@ def get_recipe(menu_name):
     if recipe_data:
         return recipe_data
     else:
-        return (f"레시피 정보를 찾을 수 없습니다.{menu_name}")
+        return (f"레시피 정보를 찾을 수 없어요.{menu_name}")
 recommended_menu = ''
 def recommend_dish(menu_type):
     global recommended_menu
@@ -523,14 +523,14 @@ def handle_weather_request(keywords):
     for country_name in capital_mapping.keys():
         if country_name in keywords:
             return weather_api(country_name)
-    return "지원하지 않는 국가입니다. 다른 국가를 입력해 주세요."
+    return "지원하지 않는 국가에요. 다른 국가를 입력해 주세요."
                 
 # Air Pollution API 호출 함수
 def handle_air_pollution_request(keywords):
     for country_name in capital_mapping.keys():
         if country_name in keywords:
             return air_pollution_api(country_name)
-    return "지원하지 않는 국가입니다. 다른 국가를 입력해 주세요."
+    return "지원하지 않는 국가에요. 다른 국가를 입력해 주세요."
 
 if __name__ == '__main__':
     app.run(debug=True)

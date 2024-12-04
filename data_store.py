@@ -198,30 +198,30 @@ stopwords = ['은', '는', '이', '가', '을', '를', '에', '의', '에서', '
 
 # 키워드 정의 딕셔너리
 intents = {
-    "greeting": ["안녕", "하이", "안녕하세요", "ㅎㅇ"],
+    "greeting": ["안녕", "하이", "안녕하세요", "ㅎㅇ", "반가워", "반갑다", "오랜만이야", "오랜만이다"],
     "emotion_joy_request": ["행복", "기쁘다", "기뻐", "기뻤어"],
     "emotion_sadness_request": ["슬프다", "슬퍼", "슬펐어", "속상", "ㅜㅜ", "ㅠㅠ"],
     "emotion_anger_request": ["화난다", "화나", "화났어", "짜증"],
     "emotion_boredom_request": ["지루", "심심"],
     "time_request": ["몇 시", "시간", "몇시"],
     "help_request": ["도와줘", "도움", "어떻게"],
-    "exchange_rate_request": ["환율", "환율정보", "환전"], #환율 정보 API 키워드(박재우)
+    "exchange_rate_request": ["환율", "환율정보", "환전"],
     "weather_request": ["날씨", "기온", "온도"],
     "air_pollution_request": ["대기오염", "공기", "미세먼지", "초미세먼지"],
-    "menu_request" : ["메뉴추천", "메뉴", "저녁추천", "아침추천", "점심추천"],
+    "menu_request" : ["메뉴추천", "메뉴", "저녁추천", "아침추천", "점심추천", "아침", "점심", "저녁"],
     "menu_type" : ["국", "밥", "후식", "반찬"],
-    "menu_recipe" : ["레시피", "어", "예", "볼래", "보겠습니다", "보다", "네", "보여줘", "응"],
+    "menu_recipe" : ["레시피", "어", "예", "볼래", "보겠습니다", "보다", "네", "보여줘", "응", "보여줄래"],
     "random_fortune_telling_request" : ["운세"],
     "random_famous_saying_request" : ["명언"],
     "random_idiom_request" : ["사자성어"],
     "random_adage_saying_request" : ["속담"],
-    "random_activity_request" : ["활동"],
+    "random_activity_request" : ["활동", "운동"],
     "random_book_request" : ["책", "도서"],
     "random_movie_request" : ["영화"],
     "random_drama_request" : ["드라마"],
     "random_webtoon_request" : ["웹툰"],
     "random_music_request" : ["음악", "노래"],
-    "random_joke_request" : ["농담", "유머"]
+    "random_joke_request" : ["농담", "유머", "썰렁", "아재", "개그"]
 }
 
 # 책 리스트
