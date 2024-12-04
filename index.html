@@ -5,6 +5,10 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>HanbatBot</title>
     <style>
+        @keyframes slide-in {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
         body {
             font-family: Arial, sans-serif;
             display: flex;
@@ -13,6 +17,11 @@
             height: 100vh;
             margin: 0;
             background-color: #f2f2f2;
+            transition: background-color 0.3s ease, color 0.3s ease; /* 다크 모드 전환 애니메이션 */
+        }
+        body.dark-mode {
+            background-color: #121212;
+            color: #ffffff;
         }
         .chat-container {
             width: 600px;
@@ -21,8 +30,12 @@
             flex-direction: column;
             border-radius: 20px;
             box-shadow: 0 0 8px rgba(0, 0, 0, 0.2);
-            overflow: auto;
-            background-color: #d9dbe9;
+            overflow: hidden;
+            background-color: #ebebeb;
+            transition: background-color 0.3s ease;
+        }
+        body.dark-mode .chat-container {
+            background-color: #1e1e1e;
         }
         .chat-header {
             background-color: #000000;
@@ -30,6 +43,12 @@
             text-align: center;
             padding: 15px;
             font-size: 1.1em;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        body.dark-mode .chat-header {
+            background-color: #333333;
         }
         .chat-messages {
             flex-grow: 1;
@@ -39,26 +58,68 @@
             border-bottom: 1px solid #e0e0e0;
             text-align: left;
             display: flex;
-            flex-direction: column;
+            flex-direction: column-reverse;
+            transition: background-color 0.3s ease;
+
+            /* 배경 이미지 추가 */
+            background-image: url('picture.jpg');
+            background-size: cover;
+            background-position: center;
+            position: relative;
+        }
+        body.dark-mode .chat-messages {
+            background-color: #2c2c2c;
+            border-color: #444444;
+
+            /* 배경 이미지 추가 */
+            background-image: url('picture_dark.jpg');
+            background-size: cover;
+            background-position: center;
+            position: relative;
         }
         .message {
-            margin-bottom: 5px;
-            line-height: 2.0;
+            margin: 10px 0;
+            padding: 10px 15px;
+            max-width: 70%;
+            word-wrap: break-word;
+            border-radius: 15px;
+            position: relative;
+            font-size: 0.95em;
+            border: 2px solid #ccc;
+            animation: slide-in 0.3s ease-in-out;
         }
         .user-message {
-            text-align: left;
+            background-color: #e8f4fc;
+            align-self: flex-end;
             color: #000000;
+            border-radius: 15px 15px 0 15px;
+            border: 2px solid #1e90ff;
+        }
+        body.dark-mode .user-message {
+            background-color: #375a7f;
+            color: #ffffff;
         }
         .bot-message {
-            text-align: right;
+            background-color: #f9f9f9;
+            align-self: flex-start;
             color: #000000;
-            
+            border-radius: 15px 15px 15px 0;
+            border: 2px solid #ff8c00;
+        }
+        body.dark-mode .bot-message {
+            background-color: #444444;
+            color: #ffffff;
         }
         .chat-input {
             display: flex;
             padding: 15px;
             border-top: 3px solid #000000;
             background-color: #fafafa;
+            transition: background-color 0.3s ease;
+        }
+        body.dark-mode .chat-input {
+            background-color: #333333;
+            border-color: #444444;
         }
         .chat-input input {
             flex-grow: 1;
@@ -67,34 +128,145 @@
             border-radius: 8px;
             font-size: 1em;
         }
+        body.dark-mode .chat-input input {
+            background-color: #2c2c2c;
+            color: #ffffff;
+        }
         .chat-input button {
-            background-color: #a0a0a0;
+            background-color: #000000;
             color: rgb(255, 255, 255);
             border: none;
-            padding: 20px;
+            padding: 10px;
             margin-left: 8px;
             cursor: pointer;
             border-radius: 8px;
             font-size: 1.5em;
         }
-        .chat-input button:hover {
-            background-color: #000000;
+        body.dark-mode .chat-input button {
+            background-color: #555555;
+        }
+        .stop-button:hover {
+            background-color: #ff3333; /* 마우스 올렸을 때 색상 변화 */
+        }
+        .loading-spinner {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            width: 20px;
+            height: 20px;
+            border: 3px solid rgba(0, 0, 0, 0.2);
+            border-top: 3px solid #000;
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+        }
+        @keyframes spin {
+            from {
+                transform: rotate(0deg);
+            }
+            to {
+                transform: rotate(360deg);
+            }
         }
     </style>
 </head>
 <body>
     <div class="chat-container">
-        <div class="chat-header"><b>국립한밭대학교 챗봇</b></div>
+        <div class="chat-header">
+            <b>국립한밭대학교</b>
+            <button id="theme-toggle"></button></button>
+        </div>
         <div class="chat-messages" id="chat-messages">
-            <div class="message bot-message"></div>
+            <!-- 메시지 내용은 스크립트에서 추가 -->
         </div>
         <div class="chat-input">
-            <input type="text" id="chat-input" placeholder="메시지 ChatBPT"/>
+            <input type="text" id="chat-input" placeholder="메시지 ChatBPT" />
             <button>↑</button>
+            <button class="stop-button" id="stop-button">STOP</button>
         </div>
     </div>
 
     <script>
+        let typingInterrupted = false;
+        let isTyping = false;
+        let currentBotMessage = null;
+
+        document.getElementById("stop-button").addEventListener("click", () => {
+            typingInterrupted = true;
+            const chatMessages = document.getElementById("chat-messages");
+            const interruptionMessage = document.createElement("div");
+            interruptionMessage.classList.add("message", "bot-message");
+            interruptionMessage.textContent = "말을 끊어...? 두고 봐요...";
+            chatMessages.prepend(interruptionMessage);
+        });
+        // 테마 전환 기능
+        document.addEventListener("DOMContentLoaded", () => {
+            const body = document.body;
+            const themeToggle = document.getElementById("theme-toggle");
+
+            // 로컬 스토리지에서 테마 상태 로드
+            const savedTheme = localStorage.getItem("theme");
+            if (savedTheme === "dark") {
+                body.classList.add("dark-mode");
+                themeToggle.textContent = "☀️";
+            }
+
+            themeToggle.addEventListener("click", () => {
+                const isDarkMode = body.classList.toggle("dark-mode");
+                themeToggle.textContent = isDarkMode ? "☀️" : "🌙";
+                localStorage.setItem("theme", isDarkMode ? "dark" : "light");
+            });
+        });
+        document.getElementById("chat-input").addEventListener("keypress", function (e) {
+            if (e.key === "Enter") {
+                document.querySelector(".chat-input button").click();
+            }
+        });
+        // 타이핑 효과 함수 (HTML 태그와 텍스트 처리)
+        function typeMessage(element, message, speed) {
+            const tempDiv = document.createElement("div");
+            tempDiv.innerHTML = message; // 메시지를 HTML로 파싱
+            const nodes = Array.from(tempDiv.childNodes); // 텍스트와 태그를 분리
+
+            let index = 0;
+
+            function type() {
+                if (typingInterrupted) {
+                    return;
+                }
+                if (index < nodes.length) {
+                    const node = nodes[index];
+
+                    if (node.nodeType === Node.TEXT_NODE) {
+                        // 텍스트 노드 처리
+                        const text = node.textContent;
+                        let textIndex = 0;
+
+                        function typeText() {
+                            if (typingInterrupted) {
+                                return;
+                            }
+                            if (textIndex < text.length) {
+                                element.innerHTML += text.charAt(textIndex);
+                                textIndex++;
+                                setTimeout(typeText, speed);
+                            } else {
+                                index++;
+                                type();
+                            }
+                        }
+                        typeText();
+                    } else {
+                        // 태그 노드 처리 (HTML 태그는 즉시 추가)
+                        element.appendChild(node.cloneNode(true));
+                        index++;
+                        type();
+                    }
+                }
+            }
+
+            type();
+        }
+
         document.querySelector(".chat-input button").addEventListener("click", async () => {
             const inputField = document.getElementById("chat-input");
             const messageText = inputField.value.trim();
@@ -105,12 +277,21 @@
                 // 사용자 메시지 출력
                 const userMessage = document.createElement("div");
                 userMessage.classList.add("message", "user-message");
-                userMessage.textContent = `나: ${messageText}`;
-                chatMessages.appendChild(userMessage);
+                userMessage.textContent = `${messageText}`;
+                chatMessages.prepend(userMessage);
 
                 inputField.value = "";
 
-                // 서버에 메시지 보내기
+                // 로딩 스피너 추가
+                const loadingMessage = document.createElement("div");
+                loadingMessage.classList.add("message", "bot-message");
+                const spinner = document.createElement("div");
+                spinner.classList.add("loading-spinner");
+                loadingMessage.appendChild(spinner);
+                chatMessages.prepend(loadingMessage);
+
+                
+                // 챗봇의 응답을 받아오기
                 const response = await fetch('http://127.0.0.1:5000/message', {
                     method: 'POST',
                     headers: {
@@ -121,20 +302,19 @@
 
                 const data = await response.json();
 
-                // 챗봇의 응답 출력
+                // 로딩 스피너 제거
+                chatMessages.removeChild(loadingMessage);
+
+                // 챗봇 메시지를 생성
                 const botMessage = document.createElement("div");
                 botMessage.classList.add("message", "bot-message");
-                botMessage.innerHTML = data.response.replace(/<br>/g, '<br />');
-                chatMessages.appendChild(botMessage);
 
-                // Scroll to the bottom
-                chatMessages.scrollTop = chatMessages.scrollHeight;
-            }
-        });
-
-        document.getElementById("chat-input").addEventListener("keypress", function (e) {
-            if (e.key === "Enter") {
-                document.querySelector(".chat-input button").click();
+                // 타이핑 효과 시작
+                chatMessages.prepend(botMessage);
+                typingInterrupted = false; // 새 메시지를 입력하면 중단 상태 초기화
+                isTyping = true; // 타이핑 시작 상태로 설정
+                currentBotMessage = botMessage; // 현재 타이핑 중인 메시지 저장
+                typeMessage(botMessage, data.response, 50); // 타이핑 속도 설정
             }
         });
     </script>
