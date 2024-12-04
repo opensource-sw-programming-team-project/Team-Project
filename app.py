@@ -35,7 +35,8 @@ from data_store import(
     idiom_list,
     adage_saying_list,
     drama_list,
-    webtoon_list
+    webtoon_list,
+    jokes
 )
 
 # 전처리 함수(불용어 제거)
@@ -195,7 +196,7 @@ def random_fortune_telling():
 # 오늘의 명언
 def random_famous_saying():
     famous_saying = random.choice(famous_saying_list)
-    return f'오늘의 명언💬\n"{famous_saying['명언']}", {famous_saying['명언가']}'
+    return f'오늘의 명언💬\n"{famous_saying["명언"]}", {famous_saying["명언가"]}'
 # 오늘의 사자성어
 def random_idiom():
     return f"오늘의 사자성어💭\n'{random.choice(idiom_list)}'"
@@ -224,6 +225,10 @@ def random_webtoon():
 def random_music():
     music = random.choice(music_list)
     return f"🎶 오늘의 추천 음악은 {music['가수']}의 '{music['제목']}'입니다."
+#아재개그
+def random_jokes():
+    joke = random.choice(jokes)
+    return f"재미있는 농담하나 해드릴게요\n😄{joke['question']}\n 👉{joke['answer']}"
 
 menu_request_activated = False
 menu_recipe_activated = False
@@ -314,6 +319,8 @@ def respond():
                 response_list.append(random_webtoon())
             elif intent == "random_music_request": # 음악
                 response_list.append(random_music())
+            elif intent == "random_joke_request": #아재개그
+                response_list.append(random_jokes())
             else: # 뭐라는거야
                 response_list.append("알 수 없는 메시지입니다.")
             
