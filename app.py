@@ -22,7 +22,6 @@ from data_store import(
     capital_mapping,
     stopwords,
     intents,
-    menu_type_DB,
     book_list,
     movie_list,
     music_list,
@@ -32,6 +31,7 @@ from data_store import(
     emotion_joy_list,
     emotion_sadness_list,
 )
+
 # 전처리 함수(불용어 제거)
 def preprocess(text):
     tokens = okt.morphs(text)
@@ -198,6 +198,9 @@ def random_movie():
 def random_music():
     music = random.choice(music_list)
     return f"오늘의 음악🎶\n{music['가수']}의 '{music['제목']}'"
+
+menu_request_activated = False
+menu_recipe_activated = False
 @app.route('/message', methods=['POST'])
 def respond():
     user_message = request.json.get('message')
@@ -211,6 +214,8 @@ def respond():
 
     # 문장 처리 함수 정의
     def process_sentence(sentences):
+        global menu_request_activated
+        global menu_recipe_activated
         #연결어를 기준으로 문장 분리
         parts = split_with_connectors_and_morpheme(sentences)
         response_list = []
@@ -220,7 +225,7 @@ def respond():
 
             # 사용자 의도 파악
             intent = calculate_intent_similarity(part)
-
+            
             # 의도에 따른 응답
             if intent == "greeting": # 안녕
                 response_list.append("안녕하세요! 반갑습니다.")
@@ -239,10 +244,22 @@ def respond():
                 exchange_rate_response = handle_exchange_rate_request(keywords)
                 response_list.append(exchange_rate_response)
             elif intent == "menu_request": # 저메추
+                menu_request_activated = True  # 저메추 활성화
                 response_list.append("반찬, 국, 밥, 후식 중 어떤 종류의 메뉴를 원하시나요?")
             elif intent == "menu_type": # 메뉴
-                mene_response = recommend_dish(keywords)
-                response_list.append(mene_response)
+                if menu_request_activated == True:
+                    mene_response = recommend_dish(keywords)
+                    response_list.append(mene_response)
+                    response_list.append("레시피를 보실건가요?")
+                    menu_recipe_activated = True
+                else:
+                    response_list.append("먼저 메뉴추천을 물어봐 주세요!")
+            elif intent == "menu_recipe": #레시피
+                if menu_recipe_activated:
+                    recipe = recipe_show()
+                    response_list.append(recipe)
+                else:
+                    response_list.append("무슨 말인지 모르겠어요")
             elif intent == "weather_request": # 날씨
                 weather_response = handle_weather_request(keywords)
                 response_list.append(weather_response)
@@ -335,7 +352,7 @@ def handle_exchange_rate_request(keywords):
                     return("해당 국가의 환율 정보를 찾을 수 없습니다.")
                         
             except requests.exceptions.RequestException as e:
-                return(f"API 요청 중 오류가 발생했습니다: {e}")
+                return(f"API요청중 오류가 발생했습니다. 잠시 기다리고 다시 요청해주세요")
                         
             break
     else:
@@ -347,7 +364,7 @@ def handle_exchange_rate_request(keywords):
 def get_menu(menu_type):
     
     # API 호출 URL
-    api_url = f"http://openapi.foodsafetykorea.go.kr/api/d6445d618d4144e3b868/COOKRCP01/json/1/99/"
+    api_url = f"http://openapi.foodsafetykorea.go.kr/api/d6445d618d4144e3b868/COOKRCP01/json/1/99/RCP_PAT2={menu_type}"
     try:
             response = requests.get(api_url, verify=False)
             response.raise_for_status()  # HTTP 오류 발생 시 예외 발생
@@ -366,7 +383,7 @@ def get_menu(menu_type):
                 menu_name = row.get('RCP_NM', '알 수 없는 메뉴')
                 menu_items.append(menu_name)
         else:
-            return ("응답에 'row' 키가 없습니다.")
+            return (f"응답에 'row' 키가 없습니다.")
     else:
         return("응답에 'COOKRCP01' 키가 없습니다.")
     
@@ -382,7 +399,8 @@ def get_menu(menu_type):
 
 def get_recipe(menu_name):
     # 메뉴 이름을 기반으로 레시피를 검색하는 기능을 추가
-    api_url = f"http://openapi.foodsafetykorea.go.kr/api/d6445d618d4144e3b868/COOKRCP01/json/1/99?RCP_NM={menu_name}"
+    api_url = f"http://openapi.foodsafetykorea.go.kr/api/d6445d618d4144e3b868/COOKRCP01/json/1/99/RCP_NM={menu_name}"
+    print(api_url)
     
     # API 요청
     response = requests.get(api_url, verify=False)
@@ -410,27 +428,43 @@ def get_recipe(menu_name):
         return recipe_data
     else:
         return (f"레시피 정보를 찾을 수 없습니다.{menu_name}")
-
+recommended_menu = ''
 def recommend_dish(menu_type):
-    
-    for menu in menu_type_DB.keys():
-        if menu in menu_type:
-            recommended_menu = get_menu(menu_type)
-            # 레시피 보기 여부
-            recipe = get_recipe(recommended_menu)
+    global recommended_menu
+    global menu_request_activated
+    if "밥" in menu_type:
+        menu_type = '밥'
+    elif "반찬" in menu_type:
+        menu_type = '반찬'
+    elif "후식" in menu_type:
+        menu_type = '후식'
+    elif "국" in menu_type:
+        menu_type = '국'
+    menu_request_activated = False
+    recommended_menu = get_menu(str(menu_type))
+    return(f"추천하는 메뉴: \n"
+           f"{recommended_menu}")
 
-            # 레시피 출력
-            if isinstance(recipe, dict):
-                return(
-                    f"추천된 메뉴: {recommended_menu}\n"
-                    f"{recommended_menu}의 레시피:\n"
-                    f"조리법:"
-                    f"\n재료: {recipe['재료']}\n"
-                    f"{recipe['조리법']}\n"
-                    f"열량: {recipe['열량']}, 탄수화물: {recipe['탄수화물']}, 단백질: {recipe['단백질']}, 지방: {recipe['지방']}, 나트륨: {recipe['나트륨']}\n"
-                )
-            else:
-                return(recipe)
+def recipe_show():
+    global recommended_menu
+    global menu_recipe_activated
+    # 레시피 보기 여부
+    recipe = get_recipe(recommended_menu)
+    cooking_steps = "\n".join(f"- {step}" for step in recipe['조리법'] if step)
+    menu_recipe_activated = False
+
+    # 레시피 출력
+    if isinstance(recipe, dict):
+        return(
+            f"추천된 메뉴: {recommended_menu}\n"
+            f"{recommended_menu}의 레시피:\n"
+            f"조리법:"
+            f"\n재료: {recipe['재료']}\n"
+            f"{cooking_steps}\n"
+            f"열량: {recipe['열량']}, 탄수화물: {recipe['탄수화물']}, 단백질: {recipe['단백질']}, 지방: {recipe['지방']}, 나트륨: {recipe['나트륨']}\n"
+        )
+    else:
+        return(recipe)
 
 
 # Weather API 호출 함수
