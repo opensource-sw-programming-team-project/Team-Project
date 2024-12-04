@@ -30,6 +30,12 @@ from data_store import(
     emotion_boredom_list,
     emotion_joy_list,
     emotion_sadness_list,
+    famous_saying_list,
+    activity_list,
+    idiom_list,
+    adage_saying_list,
+    drama_list,
+    webtoon_list
 )
 
 # 전처리 함수(불용어 제거)
@@ -183,21 +189,41 @@ def emotion_anger():
     return random.choice(emotion_anger_list)
 def emotion_boredom():
     return random.choice(emotion_boredom_list)
-# 오늘의 책
-def random_book():
-    book = random.choice(book_list)
-    return f"오늘의 책📚\n{book['저자']}의 '{book['제목']}'"
 # 오늘의 운세
 def random_fortune_telling():
     return f"오늘의 운세🔮\n{random.choice(fortune_telling_list)}"
-# 오늘의 영화
+# 오늘의 명언
+def random_famous_saying():
+    famous_saying = random.choice(famous_saying_list)
+    return f'오늘의 명언💬\n"{famous_saying['명언']}", {famous_saying['명언가']}'
+# 오늘의 사자성어
+def random_idiom():
+    return f"오늘의 사자성어💭\n'{random.choice(idiom_list)}'"
+# 오늘의 속담
+def random_adage_saying():
+    return f"오늘의 속담💭\n'{random.choice(adage_saying_list)}'"
+# 오늘의 추천 활동
+def random_activity():
+    return f"🏃 오늘의 추천 활동은 '{random.choice(activity_list)}'입니다."
+# 오늘의 추천 책
+def random_book():
+    book = random.choice(book_list)
+    return f"📚 오늘의 추천 책은 {book['저자']}의 '{book['제목']}'입니다."
+# 오늘의 추천 영화
 def random_movie():
     movie = random.choice(movie_list)
-    return f"오늘의 영화🎬\n{movie['감독']} 감독의 '{movie['제목']}'"
-# 오늘의 음악
+    return f"🎬 오늘의 추천 영화는 {movie['감독']} 감독의 '{movie['제목']}'입니다."
+# 오늘의 추천 드라마
+def random_drama():
+    return f"📺 오늘의 추천 드라마는 '{random.choice(drama_list)}'입니다."
+# 오늘의 추천 웹툰
+def random_webtoon():
+    webtoon = random.choice(webtoon_list)
+    return f"🖌️ 오늘의 추천 웹툰은 {webtoon['작가']} 작가의 '{webtoon['제목']}'입니다."
+# 오늘의 추천 음악
 def random_music():
     music = random.choice(music_list)
-    return f"오늘의 음악🎶\n{music['가수']}의 '{music['제목']}'"
+    return f"🎶 오늘의 추천 음악은 {music['가수']}의 '{music['제목']}'입니다."
 
 menu_request_activated = False
 menu_recipe_activated = False
@@ -268,12 +294,24 @@ def respond():
                 response_list.append(air_pollution_response)
             elif intent == "help_request": # 도와줘
                 response_list.append("무엇을 도와드릴까요?")
-            elif intent == "random_book_request": # 책
-                response_list.append(random_book())
             elif intent == "random_fortune_telling_request": # 운세
                 response_list.append(random_fortune_telling())
+            elif intent == "random_famous_saying_request": # 명언
+                response_list.append(random_famous_saying())
+            elif intent == "random_idiom_request": # 사자성어
+                response_list.append(random_idiom())
+            elif intent == "random_adage_saying_request": # 속담
+                response_list.append(random_adage_saying())
+            elif intent == "random_activity_request": # 활동
+                response_list.append(random_activity())
+            elif intent == "random_book_request": # 책
+                response_list.append(random_book())
             elif intent == "random_movie_request": # 영화
                 response_list.append(random_movie())
+            elif intent == "random_drama_request": # 드라마
+                response_list.append(random_drama())
+            elif intent == "random_webtoon_request": # 웹툰
+                response_list.append(random_webtoon())
             elif intent == "random_music_request": # 음악
                 response_list.append(random_music())
             else: # 뭐라는거야

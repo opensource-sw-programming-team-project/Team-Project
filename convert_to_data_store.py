@@ -2,7 +2,7 @@ import ast
 import os
 
 data_store_path = 'data_store.py'
-list_name = "movie_list"  # 업데이트할 리스트 이름
+list_name = "webtoon_list"  # 업데이트할 리스트 이름
 
 # 기존 리스트를 안전하게 파싱하여 읽어오는 함수
 def read_existing_lists(file_path, list_name):
@@ -81,7 +81,7 @@ def update_data_store(existing_data, new_data, choice, list_name, data_store_pat
 
     elif choice == "2":
         # 새로운 리스트 이름 받기
-        new_list_name = "emotion_sadness_list" # -------------------------------> 꼭 바꿔주세요
+        new_list_name = "webtoon_list" # -------------------------------> 꼭 바꿔주세요
         
         # 리스트 추가
         formatted_list = f"{new_list_name} = [\n"
@@ -93,7 +93,7 @@ def update_data_store(existing_data, new_data, choice, list_name, data_store_pat
 
         # 파일 끝에 새 리스트 추가
         with open(data_store_path, 'a', encoding='utf-8') as data_store_file:
-            data_store_file.write("\n# 슬픈 감정 리스트\n") # --------------------------> 꼭 바꿔주세요
+            data_store_file.write("\n# 웹툰 리스트\n") # --------------------------> 꼭 바꿔주세요
             data_store_file.write(formatted_list)
         print("새 리스트가 추가됨")
 
@@ -101,7 +101,7 @@ def update_data_store(existing_data, new_data, choice, list_name, data_store_pat
 if __name__ == "__main__":
     existing_data = read_existing_lists(data_store_path, list_name)
 
-    new_data = read_new_data('emotion_sadness_list.txt') # -------------------------------> 꼭 바꿔주세요
+    new_data = read_new_data('webtoon_list.txt') # -------------------------------> 꼭 바꿔주세요
 
     print("데이터 추가 방식 선택:")
     print("1. 기존 리스트에 추가")
