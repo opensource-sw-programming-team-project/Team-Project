@@ -41,7 +41,6 @@ from data_store import(
 # 전처리 함수(불용어 제거)
 def preprocess(text):
     tokens = okt.morphs(text)
-    stopwords = ['은', '는', '이', '가', '을', '를', '에', '의', '에서', '도', '으로', '하다']
     keywords = [word for word in tokens if word not in stopwords]
     return keywords
 
@@ -108,17 +107,24 @@ def split_with_connectors_and_morpheme(sentence):
     split_parts = split_with_morpheme(sentence)
     results = []
     current_part = []
-    ends_with_tuple = ("와", "과","이랑","랑")
-    connectors = [ "그리고"]
+    ends_with_tuple = ("와", "과", "이랑", "랑")
+    connectors = ["그리고"]
+    negations = ["말고","빼고","아니고"]  # 부정어구 리스트
+
     for word in split_parts:
         if word in connectors or word.endswith(ends_with_tuple):
             current_part.append(word)
             results.append(" ".join(current_part))
             current_part = []
+        elif word in negations:
+            # 부정어구가 등장하면 앞의 내용을 무시하고 부정어구부터 시작
+            current_part = [word]
         else:
             current_part.append(word)
+
     if current_part:
         results.append(" ".join(current_part))
+    return [part for part in results if part]  # 빈 문자열 제거
     return results
 
 #오타 및 맞춤법 교정
